@@ -1,52 +1,55 @@
-# # CodeIgniter specific
-# */cache/*
-# */cache/sessions/*
-# !*/cache/index.html
-# !*/cache/.htaccess
-# */logs/*
-# !*/logs/index.html
-# !*/logs/.htaccess
-# user_guide_src/build/*
-# cov-report/*
-# docs/*
+# CodeIgniter specific
+*/cache/*
+*/cache/sessions/*
+!*/cache/index.html
+!*/cache/.htaccess
+*/logs/*
+!*/logs/index.html
+!*/logs/.htaccess
+user_guide_src/build/*
+cov-report/*
+docs/*
 
-# # User uploads
-# uploads/
-# assets/uploads/
+# User uploads
+uploads/
+assets/uploads/
 
-# # Environment settings
-# application/config/development/
-# .env
-# .php-version
-# .php-ini
+# Environment settings
+application/config/development/
+.env
+.php-version
+.php-ini
 
-# # IDE and System
-# .DS_Store
-# .idea/
-# .vscode/
-# nbproject/
-# thumbs.db
+# IDE and System
+.DS_Store
+.idea/
+.vscode/
+nbproject/
+thumbs.db
 
-# # Temporary
-# _temp/
+# Temporary
+_temp/
 
-# # Dependencies
-# node_modules/
-# vendor/
+# Dependencies
+node_modules/
+vendor/
 
-# # System
-# *.swp
-# *.swo
-# *~
-# *.log
+# System
+*.swp
+*.swo
+*~
+*.log
 
-# # Configuration
-# application/config/database.php
+# Configuration
+application/config/database.php
 
-# # Images
-# images/
-# assets/images/
+# Images
+images/
+assets/images/
 
+# Sessions
+application/cache/sessions/
+application/cache/sessions/*
 # Sessions
 application/cache/sessions/
 application/cache/sessions/*
