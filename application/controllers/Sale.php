@@ -222,6 +222,15 @@ class Sale extends Cl_Controller
         echo json_encode($return);
     }
 
+    public function get_new_token_number_ajax()
+    {
+        $sale_date_for_token = date('Y-m-d');
+        $outlet_id = $this->session->userdata('outlet_id');
+        $token_query = $this->db->query("SELECT MAX(CAST(token_number AS UNSIGNED)) as tno FROM tbl_sales WHERE outlet_id='$outlet_id' AND sale_date='$sale_date_for_token'");
+        $token_no = $token_query->row('tno');
+        echo $token_no + 1;
+    }
+
     /**
      * sales info
      * @access public
@@ -580,6 +589,18 @@ class Sale extends Cl_Controller
                FROM tbl_sales WHERE outlet_id=$outlet_id")->row('bno');
         $sale_no = str_pad($sale_no + 1, 6, '0', STR_PAD_LEFT);
         $data['sale_no'] = $sale_no;
+
+        // Token Number Generation
+        $token_number_post = $this->input->get('token_number');
+        if ($token_number_post) {
+            $data['token_number'] = $token_number_post;
+        } else {
+            $sale_date_for_token = date('Y-m-d');
+            $outlet_id_safe = $outlet_id ?? $this->session->userdata('outlet_id') ?? 0;
+            $token_query = $this->db->query("SELECT MAX(CAST(token_number AS UNSIGNED)) as tno FROM tbl_sales WHERE outlet_id='$outlet_id_safe' AND sale_date='$sale_date_for_token'");
+            $token_no = $token_query ? $token_query->row('tno') : 0;
+            $data['token_number'] = $token_no + 1;
+        }
         // //////////
         $food_menu_id = $this->input->get('food_menu_id');
         $menu_name = $this->input->get('menu_name');
@@ -660,7 +681,7 @@ class Sale extends Cl_Controller
         }
 
         // ////////////////////
-        $returndata = array('sales_id' => $sales_id);
+        $returndata = array('sales_id' => $sales_id, 'token_no' => $data['token_number']);
         $this->db->trans_complete();
         if ($this->db->trans_status() === FALSE) {
             $this->db->trans_rollback();
@@ -2848,6 +2869,21 @@ class Sale extends Cl_Controller
         $sale_no = $order->sale_no ?? '';
         $sale_id = 0;
 
+        $outlet_id = $this->session->userdata('outlet_id');
+        if (empty($outlet_id)) {
+            $outlet_id = 0;
+        }
+        $sale_date_for_token = date('Y-m-d');
+        $token_number_from_frontend = $order->token_number ?? '';
+
+        if ($token_number_from_frontend != '') {
+            $token_no = $token_number_from_frontend;
+        } else {
+            $token_query = $this->db->query('SELECT MAX(CAST(token_number AS UNSIGNED)) as max_token FROM tbl_sales WHERE outlet_id=? AND sale_date=?', array($outlet_id, $sale_date_for_token));
+            $max_token = $token_query->row()->max_token;
+            $token_no = ($max_token) ? $max_token + 1 : 1;
+        }
+
         // Base sale data
         $data = [
             'self_order_content' => $this->input->post('orders'),
@@ -2872,7 +2908,7 @@ class Sale extends Cl_Controller
             'sub_total_discount_type' => $order->sub_total_discount_type ?? '',
             'given_amount' => $order->hidden_given_amount ?? 0,
             'change_amount' => $order->hidden_change_amount ?? 0,
-            'token_number' => $order->token_number ?? '',
+            'token_number' => $token_no,
             'random_code' => $order->random_code ?? '',
             'user_id' => $this->session->userdata('user_id'),
             'waiter_id' => $order->waiter_id ?? null,
@@ -3077,6 +3113,7 @@ class Sale extends Cl_Controller
             'inv_no' => $inv_no ?? null,
             'sale_inv_no' => $sale_inv_no ?? null,
             'sale_no' => $sale_no,
+            'token_no' => $token_no,
         ]);
     }
 
@@ -4918,6 +4955,20 @@ class Sale extends Cl_Controller
             'data' => $data
         );
         echo json_encode($output);
+    }
+
+    public function get_new_token_number()
+    {
+        $outlet_id = $this->session->userdata('outlet_id');
+        if (empty($outlet_id)) {
+            $outlet_id = 0;
+        }
+        $date = date('Y-m-d');
+        // Count sales for this outlet and date
+        $max_token_query = $this->db->query('SELECT MAX(token_number) as max_token FROM tbl_sales WHERE outlet_id=? AND sale_date=?', array($outlet_id, $date));
+        $max_token = $max_token_query->row()->max_token;
+        $token_no = ($max_token) ? $max_token + 1 : 1;
+        echo json_encode(['token_no' => $token_no]);
     }
 
     // public function get_last_sale()

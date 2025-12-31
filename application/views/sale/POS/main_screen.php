@@ -1,5 +1,5 @@
 <?php
-//get company information
+// get company information
 $getCompanyInfo = getCompanyInfo();
 $data_c = getLanguageManifesto();
 $waiter_app_status = $this->session->userdata('is_waiter');
@@ -11,307 +11,298 @@ $mobile_responsive_checker_online_order = $this->session->userdata('mobile_respo
 $online_customer_id = escape_output($this->session->userdata('online_customer_id'));
 
 $place_order_tooltip = $this->session->userdata('place_order_tooltip');
-$waiter_app_status=isset($waiter_app_status) && $waiter_app_status?$waiter_app_status:'';
-$is_self_order_class =isset($is_self_order) && $is_self_order?"self_order_skip":'';
-
+$waiter_app_status = isset($waiter_app_status) && $waiter_app_status ? $waiter_app_status : '';
+$is_self_order_class = isset($is_self_order) && $is_self_order ? 'self_order_skip' : '';
 
 $language_manifesto = $this->session->userdata('language_manifesto');
 $designation = $this->session->userdata('designation');
 $outlet_id = $this->session->userdata('outlet_id');
 $company_id = $this->session->userdata('company_id');
 $notification_number = 0;
-if(count($notifications)>0){
+if (count($notifications) > 0) {
     $notification_number = count($notifications);
 }
 
-/*******************************************************************************************************************
+/*
  * This section is to construct menu list****************************************************************************
- *******************************************************************************************************************
+ * ******************************************************************************************************************
  */
 $previous_category = 0;
 
 $i = 0;
-$menu_to_show = "";
-$javascript_obects = "";
-
+$menu_to_show = '';
+$javascript_obects = '';
 
 function cmp($a, $b)
 {
     return strcmp($a->category_id, $b->category_id);
 }
 
-if(isset($food_menus) && $food_menus):
+if (isset($food_menus) && $food_menus):
     $total_menus = count($food_menus);
-    usort($food_menus, "cmp");
-    $previous_price = (array)json_decode($outlet_information->food_menu_prices);
-    //new_added_zak
-    $delivery_price_outlet = (array)json_decode($outlet_information->delivery_price);
+    usort($food_menus, 'cmp');
+    $previous_price = (array) json_decode($outlet_information->food_menu_prices);
+    // new_added_zak
+    $delivery_price_outlet = (array) json_decode($outlet_information->delivery_price);
     $language_manifesto = $getCompanyInfo->language_manifesto;
- 
-foreach($food_menus as $single_menus){
-    $sale_price_take = $single_menus->sale_price;
-    $sale_price_delivery = $single_menus->sale_price;
-    //new_added_zak
-    $sale_price_delivery_details = getSalePriceDetails(isset($delivery_price_outlet["index_".$single_menus->id]) && $delivery_price_outlet["index_".$single_menus->id]?$delivery_price_outlet["index_".$single_menus->id]:'');
-    if(!$sale_price_delivery_details){
-        $sale_price_delivery_details = getSalePriceDetails($single_menus->delivery_price);
-    }
-    //end _new_added_zak
-    if(str_rot13($language_manifesto)=="eriutoeri"){
-        $previous_price = (array)json_decode($outlet_information->food_menu_prices);
-        $sale_price_tmp = isset($previous_price["tmp".$single_menus->id]) && $previous_price["tmp".$single_menus->id]?$previous_price["tmp".$single_menus->id]:'';
 
-        $dine_ta_price = $single_menus->sale_price;
-        $sale_ta_price = $single_menus->sale_price_take_away;
-        $sale_de_price = $single_menus->sale_price_delivery;
+    foreach ($food_menus as $single_menus) {
+        $sale_price_take = $single_menus->sale_price;
+        $sale_price_delivery = $single_menus->sale_price;
+        // new_added_zak
+        $sale_price_delivery_details = getSalePriceDetails(isset($delivery_price_outlet['index_' . $single_menus->id]) && $delivery_price_outlet['index_' . $single_menus->id] ? $delivery_price_outlet['index_' . $single_menus->id] : '');
+        if (!$sale_price_delivery_details) {
+            $sale_price_delivery_details = getSalePriceDetails($single_menus->delivery_price);
+        }
+        // end _new_added_zak
+        if (str_rot13($language_manifesto) == 'eriutoeri') {
+            $previous_price = (array) json_decode($outlet_information->food_menu_prices);
+            $sale_price_tmp = isset($previous_price['tmp' . $single_menus->id]) && $previous_price['tmp' . $single_menus->id] ? $previous_price['tmp' . $single_menus->id] : '';
 
-        if(isset($sale_price_tmp) && $sale_price_tmp){
-            $sale_price_ = explode("||",$sale_price_tmp);
-            $sale_price = isset($sale_price_[0]) && $sale_price_[0]?$sale_price_[0]:$single_menus->sale_price;
-            $sale_price_take = isset($sale_price_[1]) && $sale_price_[1]  && $sale_price_[1]?$sale_price_[1]:(isset($single_menus->sale_price_take_away) && $single_menus->sale_price_take_away?$single_menus->sale_price_take_away:$single_menus->sale_price);
-            $sale_price_delivery = isset($sale_price_[2]) && $sale_price_[2]?$sale_price_[2]:(isset($single_menus->sale_price_delivery) && $single_menus->sale_price_delivery?$single_menus->sale_price_delivery:$single_menus->sale_price);
-            if(!sizeof($deliveryPartners)){
-                if(isset($sale_price_[2]) && $sale_price_[2]){
-                    $sale_price_delivery = $sale_price_[2];
-                }else{
-                    $sale_price_delivery = $single_menus->sale_price_delivery;
+            $dine_ta_price = $single_menus->sale_price;
+            $sale_ta_price = $single_menus->sale_price_take_away;
+            $sale_de_price = $single_menus->sale_price_delivery;
+
+            if (isset($sale_price_tmp) && $sale_price_tmp) {
+                $sale_price_ = explode('||', $sale_price_tmp);
+                $sale_price = isset($sale_price_[0]) && $sale_price_[0] ? $sale_price_[0] : $single_menus->sale_price;
+                $sale_price_take = isset($sale_price_[1]) && $sale_price_[1] && $sale_price_[1] ? $sale_price_[1] : (isset($single_menus->sale_price_take_away) && $single_menus->sale_price_take_away ? $single_menus->sale_price_take_away : $single_menus->sale_price);
+                $sale_price_delivery = isset($sale_price_[2]) && $sale_price_[2] ? $sale_price_[2] : (isset($single_menus->sale_price_delivery) && $single_menus->sale_price_delivery ? $single_menus->sale_price_delivery : $single_menus->sale_price);
+                if (!sizeof($deliveryPartners)) {
+                    if (isset($sale_price_[2]) && $sale_price_[2]) {
+                        $sale_price_delivery = $sale_price_[2];
+                    } else {
+                        $sale_price_delivery = $single_menus->sale_price_delivery;
+                    }
                 }
             }
+        } else {
+            $sale_price = $single_menus->sale_price;
+            if ($single_menus->sale_price_take_away && $single_menus->sale_price_take_away != '0.00') {
+                $sale_price_take = $single_menus->sale_price_take_away;
+            } else {
+                $sale_price_take = $single_menus->sale_price;
+            }
+            if ($single_menus->sale_price_delivery && $single_menus->sale_price_delivery != '0.00') {
+                $sale_price_delivery = $single_menus->sale_price_delivery;
+            } else {
+                $sale_price_delivery = $single_menus->sale_price;
+            }
         }
-    }else{
-        $sale_price = $single_menus->sale_price;
-        if($single_menus->sale_price_take_away && $single_menus->sale_price_take_away!='0.00'){
-            $sale_price_take = $single_menus->sale_price_take_away;
-        }else{
-            $sale_price_take = $single_menus->sale_price;
+
+        // vr01
+        $is_variation = $single_menus->is_variation;
+
+        // checks that whether its new category or not
+        $is_new_category = false;
+        // get current food category
+        $current_category = $single_menus->category_id;
+        $veg_status1 = 'no';
+        if ($single_menus->veg_item == 'Veg Yes') {
+            $veg_status1 = 'yes';
         }
-        if($single_menus->sale_price_delivery && $single_menus->sale_price_delivery!='0.00'){
-            $sale_price_delivery = $single_menus->sale_price_delivery;
-        }else{
-            $sale_price_delivery = $single_menus->sale_price;
+        $beverage_status = 'no';
+        if ($single_menus->beverage_item == 'Bev Yes') {
+            $beverage_status = 'yes';
         }
-    }
-
-    //vr01
-    $is_variation = $single_menus->is_variation;
-
-    //checks that whether its new category or not
-    $is_new_category = false;
-    //get current food category
-    $current_category = $single_menus->category_id;
-    $veg_status1 = "no";
-    if($single_menus->veg_item=="Veg Yes"){
-        $veg_status1 = "yes";
-    }
-    $beverage_status = "no";
-    if($single_menus->beverage_item=="Bev Yes"){
-        $beverage_status = "yes";
-    }
-    $bar_status_pos = "no";
-    //check for promotion
-    $is_promo = '';
-    //if it the first time of loop then default previous category is 0
-    //if it's 0 then set current category id to $previous category and set first category div
-    if($single_menus->parent_id=="0"):
-    if($previous_category == 0){
-        $previous_category = $current_category;
-        $menu_to_show .= '<div id="category_'.$single_menus->category_id.'" class="specific_category_items_holder">';
-    }
-    //if previous category and current category is not equal. it means it's a new category
-    if($previous_category!=$current_category){
-
-        $previous_category = $current_category;
-        $is_new_category = true;
-    }
-
-    //if category is new and total menus are not finish yet then set exit to previous category and create new category
-    //div
-    if($is_new_category==true && $total_menus!=$i){
-        $menu_to_show .= '</div>';
-        $menu_to_show .= '<div id="category_'.$single_menus->category_id.'" class="specific_category_items_holder">';
-    }
-    $img_size = "images/".$single_menus->photo;
-    if(file_exists($img_size) && $single_menus->photo!=""){
-        $image_path = base_url().'images/'.$single_menus->photo;
-    }else{
-        $image_path = base_url().'images/image_thumb.png';
-    }
-
-    $food_menu_tooltip = $this->session->userdata('food_menu_tooltip');
-    $item_name_c = '';
-    if($food_menu_tooltip=="show"){
-        $item_name_c = "item_name_tippy";
-    }
-    //construct new single item content
-    $menu_to_show .= '<div class="single_item animate__animated animate__flipInX" data-price="'.$sale_price.'"  data-price_take="'.$sale_price_take.'"  data-price_delivery="'.$sale_price_delivery.'" data-is_variation="'.$is_variation.'"  id="item_'.$single_menus->id.'">';
-    // $menu_to_show .= '<img src="'.$image_path.'" alt="" width="142">';
-        $menu_to_show .= '<p class="item_name '.$item_name_c.'" data-tippy-content="'.$single_menus->name.'">'.$single_menus->name.'</p>';
-    $menu_to_show .= '<p class="item_price">'.lang('price').': <span id="price_'.$single_menus->id.'">'.getAmtP($sale_price).'</span></p>';
-    $menu_to_show .= '</div>';
-    //if its the last content and there is no more category then set exit to last category
-    if($is_new_category==false && $total_menus==$i){
-        $menu_to_show .= '</div>';
-    }
-    endif;
-    //checks and hold the status of veg item
-    if($single_menus->veg_item=='Veg Yes'){
-        $veg_status = "VEG";
-    }else{
-        $veg_status = "";
-    }
-
-    //checks and hold the status of beverage item
-    if($single_menus->beverage_item=='Beverage Yes'){
-        $soft_status = "BEV";
-    }else{
-        $soft_status = "";
-    }
-
-    //checks and hold the status of bar item
-    $bar_status = "";
-    $modifiers = '';
-    $j=1;
-    foreach($menu_modifiers as $single_menu_modifier){
-        if($single_menu_modifier->food_menu_id==$single_menus->id){
-            if($j==count($menu_modifiers)){
-                $modifiers .="{menu_modifier_id:'".$single_menu_modifier->modifier_id."',modifier_row_id:'".$single_menu_modifier->id."',menu_modifier_name:'".getPlanText($single_menu_modifier->name)."',tax_information:'".$single_menu_modifier->tax_information."',menu_modifier_price:'".getAmtP($single_menu_modifier->price)."'}";
-            }else{
-                $modifiers .="{menu_modifier_id:'".$single_menu_modifier->modifier_id."',modifier_row_id:'".$single_menu_modifier->id."',menu_modifier_name:'".getPlanText($single_menu_modifier->name)."',tax_information:'".$single_menu_modifier->tax_information."',menu_modifier_price:'".getAmtP($single_menu_modifier->price)."'},";
+        $bar_status_pos = 'no';
+        // check for promotion
+        $is_promo = '';
+        // if it the first time of loop then default previous category is 0
+        // if it's 0 then set current category id to $previous category and set first category div
+        if ($single_menus->parent_id == '0'):
+            if ($previous_category == 0) {
+                $previous_category = $current_category;
+                $menu_to_show .= '<div id="category_' . $single_menus->category_id . '" class="specific_category_items_holder">';
+            }
+            // if previous category and current category is not equal. it means it's a new category
+            if ($previous_category != $current_category) {
+                $previous_category = $current_category;
+                $is_new_category = true;
             }
 
+            // if category is new and total menus are not finish yet then set exit to previous category and create new category
+            // div
+            if ($is_new_category == true && $total_menus != $i) {
+                $menu_to_show .= '</div>';
+                $menu_to_show .= '<div id="category_' . $single_menus->category_id . '" class="specific_category_items_holder">';
+            }
+            $img_size = 'images/' . $single_menus->photo;
+            if (file_exists($img_size) && $single_menus->photo != '') {
+                $image_path = base_url() . 'images/' . $single_menus->photo;
+            } else {
+                $image_path = base_url() . 'images/image_thumb.png';
+            }
+
+            $food_menu_tooltip = $this->session->userdata('food_menu_tooltip');
+            $item_name_c = '';
+            if ($food_menu_tooltip == 'show') {
+                $item_name_c = 'item_name_tippy';
+            }
+            // construct new single item content
+            $menu_to_show .= '<div class="single_item animate__animated animate__flipInX" data-price="' . $sale_price . '"  data-price_take="' . $sale_price_take . '"  data-price_delivery="' . $sale_price_delivery . '" data-is_variation="' . $is_variation . '"  id="item_' . $single_menus->id . '">';
+            // $menu_to_show .= '<img src="'.$image_path.'" alt="" width="142">';
+            $menu_to_show .= '<p class="item_name ' . $item_name_c . '" data-tippy-content="' . $single_menus->name . '">' . $single_menus->name . '</p>';
+            $menu_to_show .= '<p class="item_price">' . lang('price') . ': <span id="price_' . $single_menus->id . '">' . getAmtP($sale_price) . '</span></p>';
+            $menu_to_show .= '</div>';
+            // if its the last content and there is no more category then set exit to last category
+            if ($is_new_category == false && $total_menus == $i) {
+                $menu_to_show .= '</div>';
+            }
+        endif;
+        // checks and hold the status of veg item
+        if ($single_menus->veg_item == 'Veg Yes') {
+            $veg_status = 'VEG';
+        } else {
+            $veg_status = '';
         }
-        $j++;
-    }
-    if($modifiers!=''){
-        $is_promo = "Yes";
-    }
-    //this portion construct javascript objects, it is used to search item from search input
-    if($single_menus->parent_id!='0'){
-        $item_name_tmp = getParentNameTemp($single_menus->parent_id).(isset($single_menus->name) && $single_menus->name?''.getPlanText($single_menus->name):'');
-    }else{
-        $item_name_tmp = getPlanText($single_menus->name);
-    }
-    //new_added_zak
-    $product_comb = '';
-    if($single_menus->product_type==2){
-        $product_comb = getDetailsCombo($single_menus->id);
-    }
 
-    $today = date("Y-m-d",strtotime('today'));
-    $promo_checker = (Object)checkPromotionWithinDatePOS($today,$single_menus->id);
-    $get_food_menu_id = '';
-    $string_text = '';
-    $get_qty = 0;
-    $qty = 0;
-    $discount = '';
-    $promo_type = '';
-    $modal_item_name_row = '';
+        // checks and hold the status of beverage item
+        if ($single_menus->beverage_item == 'Beverage Yes') {
+            $soft_status = 'BEV';
+        } else {
+            $soft_status = '';
+        }
 
-    if(isset($promo_checker) && $promo_checker && $promo_checker->status){
-        $get_food_menu_id = $promo_checker->get_food_menu_id;
-        $string_text = $promo_checker->string_text;
-        $get_qty = $promo_checker->get_qty;
-        $qty = $promo_checker->qty;
-        $discount = $promo_checker->discount;
-        $promo_type = $promo_checker->type;
-        $modal_item_name_row = getParentNameTemp($single_menus->parent_id).getFoodMenuNameCodeById($get_food_menu_id);
-        $is_promo = "Yes";
+        // checks and hold the status of bar item
+        $bar_status = '';
+        $modifiers = '';
+        $j = 1;
+        foreach ($menu_modifiers as $single_menu_modifier) {
+            if ($single_menu_modifier->food_menu_id == $single_menus->id) {
+                if ($j == count($menu_modifiers)) {
+                    $modifiers .= "{menu_modifier_id:'" . $single_menu_modifier->modifier_id . "',modifier_row_id:'" . $single_menu_modifier->id . "',menu_modifier_name:'" . getPlanText($single_menu_modifier->name) . "',tax_information:'" . $single_menu_modifier->tax_information . "',menu_modifier_price:'" . getAmtP($single_menu_modifier->price) . "'}";
+                } else {
+                    $modifiers .= "{menu_modifier_id:'" . $single_menu_modifier->modifier_id . "',modifier_row_id:'" . $single_menu_modifier->id . "',menu_modifier_name:'" . getPlanText($single_menu_modifier->name) . "',tax_information:'" . $single_menu_modifier->tax_information . "',menu_modifier_price:'" . getAmtP($single_menu_modifier->price) . "'},";
+                }
+            }
+            $j++;
+        }
+        if ($modifiers != '') {
+            $is_promo = 'Yes';
+        }
+        // this portion construct javascript objects, it is used to search item from search input
+        if ($single_menus->parent_id != '0') {
+            $item_name_tmp = getParentNameTemp($single_menus->parent_id) . (isset($single_menus->name) && $single_menus->name ? '' . getPlanText($single_menus->name) : '');
+        } else {
+            $item_name_tmp = getPlanText($single_menus->name);
+        }
+        // new_added_zak
+        $product_comb = '';
+        if ($single_menus->product_type == 2) {
+            $product_comb = getDetailsCombo($single_menus->id);
+        }
+
+        $today = date('Y-m-d', strtotime('today'));
+        $promo_checker = (object) checkPromotionWithinDatePOS($today, $single_menus->id);
+        $get_food_menu_id = '';
+        $string_text = '';
+        $get_qty = 0;
+        $qty = 0;
+        $discount = '';
+        $promo_type = '';
+        $modal_item_name_row = '';
+
+        if (isset($promo_checker) && $promo_checker && $promo_checker->status) {
+            $get_food_menu_id = $promo_checker->get_food_menu_id;
+            $string_text = $promo_checker->string_text;
+            $get_qty = $promo_checker->get_qty;
+            $qty = $promo_checker->qty;
+            $discount = $promo_checker->discount;
+            $promo_type = $promo_checker->type;
+            $modal_item_name_row = getParentNameTemp($single_menus->parent_id) . getFoodMenuNameCodeById($get_food_menu_id);
+            $is_promo = 'Yes';
+        }
+
+        if ($total_menus == $i) {
+            $javascript_obects .= "{item_id:'" . $single_menus->id . "',kitchen_id:'" . $single_menus->kitchen_id . "',kitchen_name:'" . $single_menus->kitchen_name . "',is_promo:'" . $is_promo . "',qty:'" . $qty . "',modal_item_name_row:'" . $modal_item_name_row . "',promo_type:'" . $promo_type . "',get_food_menu_id:'" . $get_food_menu_id . "',string_text:'" . $string_text . "',get_qty:'" . $get_qty . "',discount:'" . $discount . "',parent_id:'" . $single_menus->parent_id . "',product_type:'" . $single_menus->product_type . "',product_comb:'" . $product_comb . "',is_variation:'" . $is_variation . "',item_code:'" . getPlanText($single_menus->code) . "',category_name:'" . getPlanText($single_menus->category_name) . "',item_name:'" . getPlanText($single_menus->name) . "',alternative_name:'" . getPlanText($single_menus->alternative_name) . "',item_name_tmp:'" . getPlanText($item_name_tmp) . "',price:'" . getAmtP($sale_price) . "',price_take:'" . getAmtP($sale_price_take) . "',price_delivery:'" . getAmtP($sale_price_delivery) . "',price_delivery_details:'" . ($sale_price_delivery_details) . "',image:'" . $image_path . "',tax_information:'" . $single_menus->tax_information . "',vat_percentage:'0',veg_item:'" . $veg_status . "',beverage_item:'" . $soft_status . "',sold_for:'" . $single_menus->item_sold . "',veg_item_status:'" . $veg_status1 . "',beverage_item_status:'" . $beverage_status . "',modifiers:[" . $modifiers . ']}';
+        } else {
+            $javascript_obects .= "{item_id:'" . $single_menus->id . "',kitchen_id:'" . $single_menus->kitchen_id . "',kitchen_name:'" . $single_menus->kitchen_name . "',is_promo:'" . $is_promo . "',qty:'" . $qty . "',modal_item_name_row:'" . $modal_item_name_row . "',promo_type:'" . $promo_type . "',get_food_menu_id:'" . $get_food_menu_id . "',string_text:'" . $string_text . "',get_qty:'" . $get_qty . "',discount:'" . $discount . "',parent_id:'" . $single_menus->parent_id . "',product_type:'" . $single_menus->product_type . "',product_comb:'" . $product_comb . "',is_variation:'" . $is_variation . "',item_code:'" . getPlanText($single_menus->code) . "',category_name:'" . getPlanText($single_menus->category_name) . "',item_name:'" . getPlanText($single_menus->name) . "',alternative_name:'" . getPlanText($single_menus->alternative_name) . "',item_name_tmp:'" . getPlanText($item_name_tmp) . "',price:'" . getAmtP($sale_price) . "',price_take:'" . getAmtP($sale_price_take) . "',price_delivery:'" . getAmtP($sale_price_delivery) . "',price_delivery_details:'" . ($sale_price_delivery_details) . "',image:'" . $image_path . "',tax_information:'" . $single_menus->tax_information . "',vat_percentage:'0',veg_item:'" . $veg_status . "',beverage_item:'" . $soft_status . "',sold_for:'" . $single_menus->item_sold . "',veg_item_status:'" . $veg_status1 . "',beverage_item_status:'" . $beverage_status . "',modifiers:[" . $modifiers . ']},';
+        }
+        // end_new_added_zak
+
+        // increasing always with the number of loop to check the number of menus
+        $i++;
     }
-
-    if($total_menus==$i){
-        $javascript_obects .= "{item_id:'".$single_menus->id."',kitchen_id:'".$single_menus->kitchen_id."',kitchen_name:'".$single_menus->kitchen_name."',is_promo:'".$is_promo."',qty:'".$qty."',modal_item_name_row:'".$modal_item_name_row."',promo_type:'".$promo_type."',get_food_menu_id:'".$get_food_menu_id."',string_text:'".$string_text."',get_qty:'".$get_qty."',discount:'".$discount."',parent_id:'".$single_menus->parent_id."',product_type:'".$single_menus->product_type."',product_comb:'".$product_comb."',is_variation:'".$is_variation."',item_code:'".getPlanText($single_menus->code)."',category_name:'".getPlanText($single_menus->category_name)."',item_name:'".getPlanText($single_menus->name)."',alternative_name:'" . getPlanText($single_menus->alternative_name) . "',item_name_tmp:'".getPlanText($item_name_tmp)."',price:'".getAmtP($sale_price)."',price_take:'".getAmtP($sale_price_take)."',price_delivery:'".getAmtP($sale_price_delivery)."',price_delivery_details:'".($sale_price_delivery_details)."',image:'".$image_path."',tax_information:'".$single_menus->tax_information."',vat_percentage:'0',veg_item:'".$veg_status."',beverage_item:'".$soft_status."',sold_for:'".$single_menus->item_sold."',veg_item_status:'".$veg_status1."',beverage_item_status:'".$beverage_status."',modifiers:[".$modifiers."]}";
-    }else{
-        $javascript_obects .= "{item_id:'".$single_menus->id."',kitchen_id:'".$single_menus->kitchen_id."',kitchen_name:'".$single_menus->kitchen_name."',is_promo:'".$is_promo."',qty:'".$qty."',modal_item_name_row:'".$modal_item_name_row."',promo_type:'".$promo_type."',get_food_menu_id:'".$get_food_menu_id."',string_text:'".$string_text."',get_qty:'".$get_qty."',discount:'".$discount."',parent_id:'".$single_menus->parent_id."',product_type:'".$single_menus->product_type."',product_comb:'".$product_comb."',is_variation:'".$is_variation."',item_code:'".getPlanText($single_menus->code)."',category_name:'".getPlanText($single_menus->category_name)."',item_name:'".getPlanText($single_menus->name)."',alternative_name:'" . getPlanText($single_menus->alternative_name) . "',item_name_tmp:'".getPlanText($item_name_tmp)."',price:'".getAmtP($sale_price)."',price_take:'".getAmtP($sale_price_take)."',price_delivery:'".getAmtP($sale_price_delivery)."',price_delivery_details:'".($sale_price_delivery_details)."',image:'".$image_path."',tax_information:'".$single_menus->tax_information."',vat_percentage:'0',veg_item:'".$veg_status."',beverage_item:'".$soft_status."',sold_for:'".$single_menus->item_sold."',veg_item_status:'".$veg_status1."',beverage_item_status:'".$beverage_status."',modifiers:[".$modifiers."]},";
-    }
-    //end_new_added_zak
-
-
-    //increasing always with the number of loop to check the number of menus
-    $i++;
-
-}
 endif;
 
 $j = 1;
-$javascript_obects_modifier = "";
-foreach($menu_modifiers as $single_menu_modifier){
-    if($j==count($menu_modifiers)){
-        $javascript_obects_modifier .="{menu_modifier_id:'".$single_menu_modifier->modifier_id."',menu_modifier_name:'".getPlanText($single_menu_modifier->name)."',tax_information:'".$single_menu_modifier->tax_information."',menu_modifier_price:'".getAmtP($single_menu_modifier->price)."'}";
-    }else{
-        $javascript_obects_modifier .="{menu_modifier_id:'".$single_menu_modifier->modifier_id."',menu_modifier_name:'".getPlanText($single_menu_modifier->name)."',tax_information:'".$single_menu_modifier->tax_information."',menu_modifier_price:'".getAmtP($single_menu_modifier->price)."'},";
+$javascript_obects_modifier = '';
+foreach ($menu_modifiers as $single_menu_modifier) {
+    if ($j == count($menu_modifiers)) {
+        $javascript_obects_modifier .= "{menu_modifier_id:'" . $single_menu_modifier->modifier_id . "',menu_modifier_name:'" . getPlanText($single_menu_modifier->name) . "',tax_information:'" . $single_menu_modifier->tax_information . "',menu_modifier_price:'" . getAmtP($single_menu_modifier->price) . "'}";
+    } else {
+        $javascript_obects_modifier .= "{menu_modifier_id:'" . $single_menu_modifier->modifier_id . "',menu_modifier_name:'" . getPlanText($single_menu_modifier->name) . "',tax_information:'" . $single_menu_modifier->tax_information . "',menu_modifier_price:'" . getAmtP($single_menu_modifier->price) . "'},";
     }
     $j++;
 }
 $j = 1;
-$javascript_obects_modifier = "";
-foreach($menu_modifiers as $single_menu_modifier){
-    if($j==count($menu_modifiers)){
-        $javascript_obects_modifier .="{menu_modifier_id:'".$single_menu_modifier->modifier_id."',menu_modifier_name:'".getPlanText($single_menu_modifier->name)."',tax_information:'".$single_menu_modifier->tax_information."',menu_modifier_price:'".getAmtP($single_menu_modifier->price)."'}";
-    }else{
-        $javascript_obects_modifier .="{menu_modifier_id:'".$single_menu_modifier->modifier_id."',menu_modifier_name:'".getPlanText($single_menu_modifier->name)."',tax_information:'".$single_menu_modifier->tax_information."',menu_modifier_price:'".getAmtP($single_menu_modifier->price)."'},";
+$javascript_obects_modifier = '';
+foreach ($menu_modifiers as $single_menu_modifier) {
+    if ($j == count($menu_modifiers)) {
+        $javascript_obects_modifier .= "{menu_modifier_id:'" . $single_menu_modifier->modifier_id . "',menu_modifier_name:'" . getPlanText($single_menu_modifier->name) . "',tax_information:'" . $single_menu_modifier->tax_information . "',menu_modifier_price:'" . getAmtP($single_menu_modifier->price) . "'}";
+    } else {
+        $javascript_obects_modifier .= "{menu_modifier_id:'" . $single_menu_modifier->modifier_id . "',menu_modifier_name:'" . getPlanText($single_menu_modifier->name) . "',tax_information:'" . $single_menu_modifier->tax_information . "',menu_modifier_price:'" . getAmtP($single_menu_modifier->price) . "'},";
     }
     $j++;
 }
 
 $j = 1;
-$javascript_obects_only_modifier = "";
-foreach($only_modifiers as $single_menu_modifier){
-    if($j==count($only_modifiers)){
-        $javascript_obects_only_modifier .="{menu_modifier_id:'".$single_menu_modifier->id."',menu_modifier_name:'".getPlanText($single_menu_modifier->name)."',tax_information:'".$single_menu_modifier->tax_information."',menu_modifier_price:'".getAmtP($single_menu_modifier->price)."'}";
-    }else{
-        $javascript_obects_only_modifier .="{menu_modifier_id:'".$single_menu_modifier->id."',menu_modifier_name:'".getPlanText($single_menu_modifier->name)."',tax_information:'".$single_menu_modifier->tax_information."',menu_modifier_price:'".getAmtP($single_menu_modifier->price)."'},";
+$javascript_obects_only_modifier = '';
+foreach ($only_modifiers as $single_menu_modifier) {
+    if ($j == count($only_modifiers)) {
+        $javascript_obects_only_modifier .= "{menu_modifier_id:'" . $single_menu_modifier->id . "',menu_modifier_name:'" . getPlanText($single_menu_modifier->name) . "',tax_information:'" . $single_menu_modifier->tax_information . "',menu_modifier_price:'" . getAmtP($single_menu_modifier->price) . "'}";
+    } else {
+        $javascript_obects_only_modifier .= "{menu_modifier_id:'" . $single_menu_modifier->id . "',menu_modifier_name:'" . getPlanText($single_menu_modifier->name) . "',tax_information:'" . $single_menu_modifier->tax_information . "',menu_modifier_price:'" . getAmtP($single_menu_modifier->price) . "'},";
     }
     $j++;
 }
 
-/*******************************************************************************************************************
+/*
  * End of This secion is to construct menu list*********************************************************************
- *******************************************************************************************************************
+ * ******************************************************************************************************************
  */
 
-/*******************************************************************************************************************
+/*
  * This section is to construct category ****************************************************************************
- *******************************************************************************************************************
+ * ******************************************************************************************************************
  */
 $i = 1;
 $kitchens_objects = '';
 $total_kitchens = count($kitchens);
-foreach($kitchens as $kitchen){
-    if($total_kitchens==$i){
-        $kitchens_objects .= "{kitchen_id:'".$kitchen->id."',kitchen_name:'".getPlanText($kitchen->name)."',printer_id:'".$kitchen->printer_id."'}";
-    }else{
-        $kitchens_objects .= "{kitchen_id:'".$kitchen->id."',kitchen_name:'".getPlanText($kitchen->name)."',printer_id:'".$kitchen->printer_id."'},";
+foreach ($kitchens as $kitchen) {
+    if ($total_kitchens == $i) {
+        $kitchens_objects .= "{kitchen_id:'" . $kitchen->id . "',kitchen_name:'" . getPlanText($kitchen->name) . "',printer_id:'" . $kitchen->printer_id . "'}";
+    } else {
+        $kitchens_objects .= "{kitchen_id:'" . $kitchen->id . "',kitchen_name:'" . getPlanText($kitchen->name) . "',printer_id:'" . $kitchen->printer_id . "'},";
     }
 }
 
-
-/*******************************************************************************************************************
+/*
  * End of This secion is to construct category ****************************************************************************
- *******************************************************************************************************************
+ * ******************************************************************************************************************
  */
 
-
-/*******************************************************************************************************************
+/*
  * This section is to construct category ****************************************************************************
- *******************************************************************************************************************
+ * ******************************************************************************************************************
  */
 $i = 1;
 $cateogry_slide_to_show = '';
-foreach($menu_categories as $single_category){
-
-    if($i = 1){
-        $cateogry_slide_to_show .= '<li><a href="#" class="category_button" id="button_category_'.$single_category->id.'">'.getPlanText($single_category->category_name).'</a></li>';
-
-    }else{
-        $cateogry_slide_to_show .= '<li><a href="#" class="category_button" id="button_category_'.$single_category->id.'">'.getPlanText($single_category->category_name).'</a></li>';
+foreach ($menu_categories as $single_category) {
+    if ($i = 1) {
+        $cateogry_slide_to_show .= '<li><a href="#" class="category_button" id="button_category_' . $single_category->id . '">' . getPlanText($single_category->category_name) . '</a></li>';
+    } else {
+        $cateogry_slide_to_show .= '<li><a href="#" class="category_button" id="button_category_' . $single_category->id . '">' . getPlanText($single_category->category_name) . '</a></li>';
     }
-
 }
-/*******************************************************************************************************************
+
+/*
  * End of This secion is to construct category ****************************************************************************
- *******************************************************************************************************************
+ * ******************************************************************************************************************
  */
-/********************************************************************************************************************
+
+/*
  * This section is to construct options of customer select input*****************************************************
  * ******************************************************************************************************************
  */
@@ -320,167 +311,161 @@ $total_customers = count($customers);
 $i = 1;
 $customer_objects = '';
 $check_walk_in_customer = 1;
-foreach ($customers as $customer){
-    //set default customer for pos screen
-    $selected = "";
+foreach ($customers as $customer) {
+    // set default customer for pos screen
+    $selected = '';
     $default_customer = $getCompanyInfo->default_customer;
-    if($customer->id==$default_customer){
-        $selected = "selected";
+    if ($customer->id == $default_customer) {
+        $selected = 'selected';
     }
-    if($is_online_order=="Yes"){
-        if($customer->id==$online_customer_id){
-            $selected = "selected";
+    if ($is_online_order == 'Yes') {
+        if ($customer->id == $online_customer_id) {
+            $selected = 'selected';
         }
     }
-    //set current due
+    // set current due
     $current_due = 0;
-    if($customer->id!=1){
+    if ($customer->id != 1) {
         $current_due = getCustomerDue($customer->id);
     }
 
-    if($customer->id==1){
+    if ($customer->id == 1) {
         $check_walk_in_customer++;
     }
-    if($customer->name=='Walk-in Customer'){
-        $customers_option = '<option '.$selected.' data-default_discount="'.$customer->default_discount.'" data-same_or_diff_state="'.$customer->same_or_diff_state.'" data-customer_address="'.getPlanText($customer->address).'" data-customer_gst_number="'.getPlanText($customer->gst_number).'" data-current_due="'.$current_due.'" value="'.$customer->id.'" selected>'.(getPlanText($customer->name)).' '.$customer->phone.'</option>'.$customers_option;
-    }else{
-        $customers_option .= '<option '.$selected.' data-default_discount="'.$customer->default_discount.'" data-same_or_diff_state="'.$customer->same_or_diff_state.'"  data-customer_address="'.getPlanText($customer->address).'" data-customer_gst_number="'.getPlanText($customer->gst_number).'" data-current_due="'.$current_due.'" value="'.$customer->id.'" '.$selected.'>'.(getPlanText($customer->name)).' '.$customer->phone.'</option>';
+    if ($customer->name == 'Walk-in Customer') {
+        $customers_option = '<option ' . $selected . ' data-default_discount="' . $customer->default_discount . '" data-same_or_diff_state="' . $customer->same_or_diff_state . '" data-customer_address="' . getPlanText($customer->address) . '" data-customer_gst_number="' . getPlanText($customer->gst_number) . '" data-current_due="' . $current_due . '" value="' . $customer->id . '" selected>' . (getPlanText($customer->name)) . ' ' . $customer->phone . '</option>' . $customers_option;
+    } else {
+        $customers_option .= '<option ' . $selected . ' data-default_discount="' . $customer->default_discount . '" data-same_or_diff_state="' . $customer->same_or_diff_state . '"  data-customer_address="' . getPlanText($customer->address) . '" data-customer_gst_number="' . getPlanText($customer->gst_number) . '" data-current_due="' . $current_due . '" value="' . $customer->id . '" ' . $selected . '>' . (getPlanText($customer->name)) . ' ' . $customer->phone . '</option>';
     }
 
-    if($total_customers==$i){
-        $customer_objects .= "{customer_id:'".$customer->id."',default_discount:'".$customer->default_discount."',same_or_diff_state:'".$customer->same_or_diff_state."',customer_name:'".(getPlanText($customer->name))."',customer_address:'".getPlanText($customer->address)."',gst_number:'".$customer->gst_number."'}";
-    }else{
-        $customer_objects .= "{customer_id:'".$customer->id."',default_discount:'".$customer->default_discount."',same_or_diff_state:'".$customer->same_or_diff_state."',customer_name:'".(getPlanText($customer->name))."',customer_address:'".getPlanText($customer->address)."',gst_number:'".$customer->gst_number."'},";
+    if ($total_customers == $i) {
+        $customer_objects .= "{customer_id:'" . $customer->id . "',default_discount:'" . $customer->default_discount . "',same_or_diff_state:'" . $customer->same_or_diff_state . "',customer_name:'" . (getPlanText($customer->name)) . "',customer_address:'" . getPlanText($customer->address) . "',gst_number:'" . $customer->gst_number . "'}";
+    } else {
+        $customer_objects .= "{customer_id:'" . $customer->id . "',default_discount:'" . $customer->default_discount . "',same_or_diff_state:'" . $customer->same_or_diff_state . "',customer_name:'" . (getPlanText($customer->name)) . "',customer_address:'" . getPlanText($customer->address) . "',gst_number:'" . $customer->gst_number . "'},";
     }
 
     $i++;
 }
 
-if($check_walk_in_customer==1 && $customers_option==""){
+if ($check_walk_in_customer == 1 && $customers_option == '') {
     $customers_option .= '<option selected data-default_discount="0" data-current_due="" value="1">Walk-in Customer</option>';
     $customer_objects .= "{customer_id:'1',customer_name:'Walk-in Customer',customer_address:'',gst_number:''}";
-}else if($check_walk_in_customer==1 && $customers_option){
+} else if ($check_walk_in_customer == 1 && $customers_option) {
     $customers_option .= '<option selected data-default_discount="0" data-current_due="" value="1">Walk-in Customer</option>';
     $customer_objects .= ",{customer_id:'1',customer_name:'Walk-in Customer',customer_address:'',gst_number:''}";
 }
 
-/********************************************************************************************************************
+/*
  * This section is to construct options of customer select input*****************************************************
  * ******************************************************************************************************************
  */
 
-/********************************************************************************************************************
+/*
  * This section is to construct options of customer select input*****************************************************
  * ******************************************************************************************************************
  */
 $waiters_option = '';
 $default_waiter_id = 0;
 $outlet = getOutletById($this->session->userdata('outlet_id'));
-foreach ($waiters as $waiter){
-    $selected = "";
+foreach ($waiters as $waiter) {
+    $selected = '';
     $role = $this->session->userdata('role');
     $user_id = $this->session->userdata('user_id');
-    if(str_rot13($language_manifesto)=="eriutoeri"):
+    if (str_rot13($language_manifesto) == 'eriutoeri'):
         $default_waiter = $outlet->default_waiter;
     else:
         $default_waiter = $getCompanyInfo->default_waiter;
     endif;
 
-    if($waiter->id==$default_waiter){
-        $selected = "selected";
+    if ($waiter->id == $default_waiter) {
+        $selected = 'selected';
         $default_waiter_id = $waiter->id;
-    }else{
-        if(isset($role) && $role!="Admin"){
-            if($waiter->id==$user_id){
-                $selected = "selected";
+    } else {
+        if (isset($role) && $role != 'Admin') {
+            if ($waiter->id == $user_id) {
+                $selected = 'selected';
                 $default_waiter_id = $user_id;
             }
         }
     }
-    if($waiter->full_name=='Default Waiter'){
-        $waiters_option = '<option '.$selected.' value="'.$waiter->id.'">'.getPlanText($waiter->full_name).'</option>'.$waiters_option;
-    }else{
-        $waiters_option .= '<option '.$selected.' value="'.$waiter->id.'">'.getPlanText($waiter->full_name).'</option>';
+    if ($waiter->full_name == 'Default Waiter') {
+        $waiters_option = '<option ' . $selected . ' value="' . $waiter->id . '">' . getPlanText($waiter->full_name) . '</option>' . $waiters_option;
+    } else {
+        $waiters_option .= '<option ' . $selected . ' value="' . $waiter->id . '">' . getPlanText($waiter->full_name) . '</option>';
     }
-
 }
 
-/********************************************************************************************************************
+/*
  * End This section is to construct table modal's content****************************************************************
- ********************************************************************************************************************
- **/
+ * *******************************************************************************************************************
+ */
 
-/************************************************************************************************************************
+/*
  * Construct new orders those are still on processing *******************************************************************
  * **********************************************************************************************************************
  */
 
-
-/************************************************************************************************************************
+/*
  * Construct payment method drop down ***********************************************************************************
  * **********************************************************************************************************************
  */
 $payment_method_options = '';
 
-foreach ($payment_methods as $payment_method){
-    $selected = "";
+foreach ($payment_methods as $payment_method) {
+    $selected = '';
     $default_payment = $getCompanyInfo->default_payment;
-    if($payment_method->id==$default_payment){
-        $selected = "selected";
+    if ($payment_method->id == $default_payment) {
+        $selected = 'selected';
     }
-    $payment_method_options .= '<option '.$selected.' value="'.$payment_method->id.'">'.$payment_method->name.'</option>';
+    $payment_method_options .= '<option ' . $selected . ' value="' . $payment_method->id . '">' . $payment_method->name . '</option>';
 }
 
-/************************************************************************************************************************
+/*
  * End of Construct payment method drop down ***********************************************************************************
  * **********************************************************************************************************************
  */
 
-
-/************************************************************************************************************************
+/*
  * Construct notification list ***********************************************************************************
  * **********************************************************************************************************************
  */
 $notification_list_show = '';
 
-foreach ($notifications as $single_notification){
-    $notification_list_show .= '<div class="single_row_notification fix" id="single_notification_row_'.$single_notification->id.'">';
+foreach ($notifications as $single_notification) {
+    $notification_list_show .= '<div class="single_row_notification fix" id="single_notification_row_' . $single_notification->id . '">';
     $notification_list_show .= '<div class="fix single_notification_check_box">';
-    $notification_list_show .= '<input class="single_notification_checkbox" type="checkbox" id="single_notification_'.$single_notification->id.'" value="'.$single_notification->id.'">';
+    $notification_list_show .= '<input class="single_notification_checkbox" type="checkbox" id="single_notification_' . $single_notification->id . '" value="' . $single_notification->id . '">';
     $notification_list_show .= '</div>';
-    $notification_list_show .= '<div class="fix single_notification">'.$single_notification->notification.'</div>';
+    $notification_list_show .= '<div class="fix single_notification">' . $single_notification->notification . '</div>';
     $notification_list_show .= '<div class="fix single_serve_button">';
-    $notification_list_show .= '<button class="single_serve_b" id="notification_serve_button_'.$single_notification->id.'">'.lang('serve_take_delivery').'</button>';
+    $notification_list_show .= '<button class="single_serve_b" id="notification_serve_button_' . $single_notification->id . '">' . lang('serve_take_delivery') . '</button>';
     $notification_list_show .= '</div>';
     $notification_list_show .= '</div>';
-
 }
 
-/************************************************************************************************************************
+/*
  * End of Construct notification list ***********************************************************************************
  * **********************************************************************************************************************
  */
 
-
-
 ?>
 
 <?php
-    $wl = getWhiteLabel();
-    if($wl){
-        if($wl->site_name){
-            $site_name = $wl->site_name;
-        }
-        if($wl->footer){
-            $footer = $wl->footer;
-        }
-        if($wl->system_logo){
-            $system_logo = base_url()."images/".$wl->system_logo;
-        }else{
-            $system_logo = base_url()."images/logo.png";
-        }
+$wl = getWhiteLabel();
+if ($wl) {
+    if ($wl->site_name) {
+        $site_name = $wl->site_name;
     }
-    ?>
+    if ($wl->footer) {
+        $footer = $wl->footer;
+    }
+    if ($wl->system_logo) {
+        $system_logo = base_url() . 'images/' . $wl->system_logo;
+    } else {
+        $system_logo = base_url() . 'images/logo.png';
+    }
+}
+?>
 <!DOCTYPE html>
 <html>
 
@@ -488,7 +473,7 @@ foreach ($notifications as $single_notification){
     <!-- <meta name="viewport" content="width=device-width, initial-scale=1.0"> -->
     <meta name="viewport" content="width=device-width, user-scalable=no">
     <title><?php echo escape_output($site_name); ?></title>
-    <script src="<?php echo base_url()?>assets/POS/js/jquery-3.3.1.min.js"></script>
+    <script src="<?php echo base_url() ?>assets/POS/js/jquery-3.3.1.min.js"></script>
     <link rel="stylesheet" type="text/css" href="<?php echo base_url(); ?>assets/POS/css/style.css">
     <link rel="stylesheet" type="text/css" href="<?php echo base_url(); ?>assets/POS/css/style2.css">
     <link rel="stylesheet" type="text/css" href="<?php echo base_url(); ?>assets/POS/css/customModal.css">
@@ -510,7 +495,7 @@ foreach ($notifications as $single_notification){
 
     <link rel="stylesheet" href="<?php echo base_url(); ?>frequent_changing/css/custom_css.css">
 
-    <script src="<?php echo base_url()?>assets/POS/js/jquery-ui.js"></script>
+    <script src="<?php echo base_url() ?>assets/POS/js/jquery-ui.js"></script>
     <script type="text/javascript" src="<?php echo base_url(); ?>assets/POS/js/lib/scrollbar/slimScrollbar.js"></script>
     <!-- Sweet alert -->
     <script src="<?php echo base_url(); ?>assets/POS/sweetalert2/dist/sweetalert.min.js"></script>
@@ -540,18 +525,19 @@ foreach ($notifications as $single_notification){
 
     <!-- Favicon -->
     <link rel="shortcut icon" href="<?php echo base_url(); ?>images/favicon.ico" type="image/x-icon">
-    <link rel="stylesheet" href="<?php echo base_url();?>assets/POS/css/datepicker.css">
-    <link rel="stylesheet" href="<?php echo base_url();?>assets/POS/css/animate.min.css">
-    <link rel="stylesheet" href="<?php echo base_url();?>assets/POS/css/lib/perfect-scrollbar/css/perfect-scrollbar.css">
+    <link rel="stylesheet" href="<?php echo base_url(); ?>assets/POS/css/datepicker.css">
+    <link rel="stylesheet" href="<?php echo base_url(); ?>assets/POS/css/animate.min.css">
+    <link rel="stylesheet" href="<?php echo base_url(); ?>assets/POS/css/lib/perfect-scrollbar/css/perfect-scrollbar.css">
 
-    <link rel="stylesheet" href="<?php echo base_url()?>frequent_changing/table_design/custom_card_design_zak.css">
-    <link rel="stylesheet" href="<?php echo base_url()?>frequent_changing/table_design/jquery-ui.css">
-    <link rel="stylesheet" href="<?php echo base_url()?>frequent_changing/table_design/jquery-ui.structure.css">
+    <link rel="stylesheet" href="<?php echo base_url() ?>frequent_changing/table_design/custom_card_design_zak.css">
+    <link rel="stylesheet" href="<?php echo base_url() ?>frequent_changing/table_design/jquery-ui.css">
+    <link rel="stylesheet" href="<?php echo base_url() ?>frequent_changing/table_design/jquery-ui.structure.css">
 
 
     <style>
     <?php
-    if($waiter_app_status=="Yes"): ?>
+    if ($waiter_app_status == 'Yes'):
+        ?>
 
     .full-width-for-waiter {
         width: 100% !important;
@@ -560,11 +546,12 @@ foreach ($notifications as $single_notification){
         display: none !important;
     }
     <?php endif;
-    if($is_self_order=="Yes" || $is_online_order=="Yes"):?>
+    if ($is_self_order == 'Yes' || $is_online_order == 'Yes'): ?>
         #main_part .left_item .main_middle #bottom_absolute .bottom__info .main_bottom .button_group {
             grid-template-columns: repeat(2, 1fr);
         }
-    <?php endif;
+    <?php
+    endif;
     ?>
     </style>
 </head>
@@ -574,9 +561,9 @@ foreach ($notifications as $single_notification){
 
     <?php
     $invoice_logo = $this->session->userdata('invoice_logo');
-    if($invoice_logo):
-    ?>
-    <input type="hidden" id="invoice_logo" value="<?=escape_output($invoice_logo)?>">
+    if ($invoice_logo):
+        ?>
+    <input type="hidden" id="invoice_logo" value="<?= escape_output($invoice_logo) ?>">
         <?php
     endif;
     ?>
@@ -588,83 +575,86 @@ foreach ($notifications as $single_notification){
     <span id="stop_refresh_for_search" class="ir_display_none"><?php echo lang('yes'); ?></span>
     <div id="main-wrapper-content" class="wrapper">
         <!-- Main Header Part -->
-        <div class="top_header_part <?php echo escape_output($is_self_order_class)?'self_order_mode':'' ?>">
+        <div class="top_header_part <?php echo escape_output($is_self_order_class) ? 'self_order_mode' : '' ?>">
             <div class="left_item">
                 <div class="header_part_middle">
 
                     <ul class="icon__menu">
-                        <?php if($is_self_order_class):
+                        <?php
+                        if ($is_self_order_class):
                             $online_login = 'none';
                             $online_without_login = 'none';
 
-                            if($online_customer_id){
+                            if ($online_customer_id) {
                                 $online_login = '';
-                            }else{
+                            } else {
                                 $online_without_login = '';
                             }
                             ?>
-                            <li class="self_order_and_online_order" style="display:<?php echo escape_output($online_login)?>">
-                                <a href="<?php echo base_url();?>authentication/logout" class="bg__blue irp_my_orders"
+                            <li class="self_order_and_online_order" style="display:<?php echo escape_output($online_login) ?>">
+                                <a href="<?php echo base_url(); ?>authentication/logout" class="bg__blue irp_my_orders"
                                 ><i class="fa fa-sign-out"> </i> <?php echo lang('back'); ?></a>
                             </li>
-                            <li class="self_order_and_online_order" style="display:<?php echo escape_output($online_without_login)?>">
-                                <a href="<?php echo base_url();?>authentication/logout" class="bg__blue irp_my_orders"
+                            <li class="self_order_and_online_order" style="display:<?php echo escape_output($online_without_login) ?>">
+                                <a href="<?php echo base_url(); ?>authentication/logout" class="bg__blue irp_my_orders"
                                 ><i class="fa fa-sign-out"> </i> <?php echo lang('back'); ?></a>
                             </li>
                             <li class="self_order_and_online_order">
-                                <a href="#" class="bg__blue irp_my_orders online_my_order online_order_after_login" style="display:<?php echo escape_output($online_login)?>"
+                                <a href="#" class="bg__blue irp_my_orders online_my_order online_order_after_login" style="display:<?php echo escape_output($online_login) ?>"
                                 ><i class="fa fa-file"> </i> <?php echo lang('My_Orders'); ?></a>
                             </li>
-                            <?php if($is_self_order=="Yes" && $is_online_order!="Yes"):?>
+                            <?php if ($is_self_order == 'Yes' && $is_online_order != 'Yes'): ?>
 
                             <li class="self_order_and_online_order">
                                 <a href="#" class="bg__blue irp_my_orders self_my_order"
                                 ><i class="fa fa-file"> </i> <?php echo lang('My_Orders'); ?></a>
                             </li>
-                                <?php endif?>
-                            <?php if($is_online_order=="Yes"):
+                                <?php endif ?>
+                            <?php
+                            if ($is_online_order == 'Yes'):
                                 ?>
 
-                                <li class="self_order_and_online_order online_order_before_login"   style="display:<?php echo escape_output($online_without_login)?>">
+                                <li class="self_order_and_online_order online_order_before_login"   style="display:<?php echo escape_output($online_without_login) ?>">
                                     <a href="#" data-title="<?php echo lang('signup'); ?>" class="bg__blue irp_my_orders plus_button plus_button_online_order"
                                     ><i class="fa fa-plus"> </i> <?php echo lang('signup'); ?></a>
                                 </li>
-                                <li class="self_order_and_online_order online_order_before_login"  style="display:<?php echo escape_output($online_without_login)?>">
+                                <li class="self_order_and_online_order online_order_before_login"  style="display:<?php echo escape_output($online_without_login) ?>">
                                     <a href="#" class="bg__blue irp_my_orders login_modal_btn"
                                     ><i class="fa fa-sign-in"> </i> <?php echo lang('login'); ?></a>
                                 </li>
-                                <li class="self_order_and_online_order online_order_after_login" style="display:<?php echo escape_output($online_login)?>">
+                                <li class="self_order_and_online_order online_order_after_login" style="display:<?php echo escape_output($online_login) ?>">
                                     <a href="#" data-title_custom="<?php echo lang('edit_profile'); ?>"  data-title="<?php echo lang('edit_profile'); ?>"  class="bg__blue irp_my_orders edit_customer"
                                     ><i class="fa fa-edit"> </i> <?php echo lang('edit_profile'); ?></a>
                                 </li>
-                                <li class="online_order_after_login" style="display:<?php echo escape_output($online_login)?>">
-                                    <a href="<?php echo base_url();?>online_order_logout" class="bg__blue irp_my_orders"
+                                <li class="online_order_after_login" style="display:<?php echo escape_output($online_login) ?>">
+                                    <a href="<?php echo base_url(); ?>online_order_logout" class="bg__blue irp_my_orders"
                                     ><i class="fa fa-sign-out"> </i> <?php echo lang('logout'); ?></a>
                                 </li>
-                            <?php endif;?>
-                        <?php else:?>
+                            <?php endif; ?>
+                        <?php else: ?>
                             <li>
-                                <a href="<?php echo base_url();?>Authentication/logOut"  data-tippy-content="<?php echo lang('logout'); ?>" class="header_menu_icon logout_for_user"
+                                <a href="<?php echo base_url(); ?>Authentication/logOut"  data-tippy-content="<?php echo lang('logout'); ?>" class="header_menu_icon logout_for_user"
                                 ><i class="fa fa-sign-out"> </i></a>
                             </li>
-                        <?php endif;?>
+                        <?php endif; ?>
                         <!-- <li class="has__children <?php echo escape_output($is_self_order_class) ?>">
                             <a href="#" class="header_menu_icon" data-tippy-content="<?php echo lang('language'); ?>">
                                 <i class="fal fa-globe"></i>
                             </a>
                             <ul class="sub__menu" role="menu">
-                                <?php $language = $this->session->userdata('language');
-                                    if(!$language){
-                                        $language = "english";
-                                    }
+                                <?php
+                                $language = $this->session->userdata('language');
+                                if (!$language) {
+                                    $language = 'english';
+                                }
                                 ?>
                                 <?php
-                                $dir = glob("application/language/*",GLOB_ONLYDIR);
+                                $dir = glob('application/language/*', GLOB_ONLYDIR);
                                 foreach ($dir as $value):
-                                    $separete = explode("language/",$value);
+                                    $separete = explode('language/', $value);
                                     ?>
-                                <li class="<?=isset($language) && $language==$separete[1]?'active_lng':''?>"><a
-                                       class="action_main_menu" data-url="<?php echo base_url(); ?>Authentication/setlanguagePOS/<?=escape_output($separete[1])?>" href="#"><?php echo escape_output(ucfirstcustom($separete[1]))?></a>
+                                <li class="<?= isset($language) && $language == $separete[1] ? 'active_lng' : '' ?>"><a
+                                       class="action_main_menu" data-url="<?php echo base_url(); ?>Authentication/setlanguagePOS/<?= escape_output($separete[1]) ?>" href="#"><?php echo escape_output(ucfirstcustom($separete[1])) ?></a>
                                 </li>
                                 <?php
                                 endforeach;
@@ -709,41 +699,41 @@ foreach ($notifications as $single_notification){
                                 data-tippy-content="<?php echo lang('kitchen_notification'); ?>">
                                 <i class="fal fa-bell"></i>
                                 <span id="notification_counter"
-                                    class="c_badge <?php echo escape_output($notification_number)?'':'txt_11'?>"><?php echo escape_output($notification_number); ?></span>
+                                    class="c_badge <?php echo escape_output($notification_number) ? '' : 'txt_11' ?>"><?php echo escape_output($notification_number); ?></span>
                             </a>
                         </li>
                          -->
-                        <?php    if($designation!="Waiter"):?>
+                        <?php if ($designation != 'Waiter'): ?>
                         <li>
                             <a href="#" id="register_details" class="header_menu_icon <?php echo escape_output($is_self_order_class) ?> register_details"
                                 data-tippy-content="<?php echo lang('register'); ?>">
                                 <i class="fal fa-registered"></i>
                             </a>
                         </li>
-                        <?php endif?>
+                        <?php endif ?>
                         <li>
                             <a href="#" class="header_menu_icon <?php echo escape_output($is_self_order_class) ?>" id="go_to_dashboard" data-tippy-content="<?php
-                                if ($this->session->userdata('role') == 'Admin') {
-                                    echo lang('dashboard');
-                                }else{
-                                    echo lang('back');
-                                }
-                                ?>">
+if ($this->session->userdata('role') == 'Admin') {
+    echo lang('dashboard');
+} else {
+    echo lang('back');
+}
+?>">
                                 <i class="fal fa-tachometer-alt-fast"></i>
                             </a>
                         </li>
 
                         <!-- <li>
-                            <a href="<?php echo base_url()?>customer-panel" class="header_menu_icon  <?php echo escape_output($is_self_order_class) ?>" target="_blank"  data-tippy-content="<?php
-                            echo lang('customer_panel');
-                            ?>">
+                            <a href="<?php echo base_url() ?>customer-panel" class="header_menu_icon  <?php echo escape_output($is_self_order_class) ?>" target="_blank"  data-tippy-content="<?php
+echo lang('customer_panel');
+?>">
                                 <i class="fal fa-desktop"></i>
                             </a>
                         </li>
                         <li>
-                            <a href="<?php echo base_url()?>order-status-screen" class="header_menu_icon  <?php echo escape_output($is_self_order_class) ?>" target="_blank"  data-tippy-content="<?php
-                            echo lang('order_status_screen');
-                            ?>">
+                            <a href="<?php echo base_url() ?>order-status-screen" class="header_menu_icon  <?php echo escape_output($is_self_order_class) ?>" target="_blank"  data-tippy-content="<?php
+echo lang('order_status_screen');
+?>">
                                 <i class="fa fa-desktop"></i>
                             </a>
                         </li> -->
@@ -767,7 +757,7 @@ foreach ($notifications as $single_notification){
             <div class="header_part_right">
                 <ul class="btn__menu btn__menu_left <?php echo escape_output($is_self_order_class) ?>">
                     <li>
-                        <div class="pos_outlet_info irestora_font_div_pos"><?php echo escape_output($this->session->userdata('outlet_name'))?></div>
+                        <div class="pos_outlet_info irestora_font_div_pos"><?php echo escape_output($this->session->userdata('outlet_name')) ?></div>
                     </li>
                 </ul>
                 <ul class="btn__menu">
@@ -791,14 +781,14 @@ foreach ($notifications as $single_notification){
                 </ul>
             </div>
         </div>
-        <div class="top_header_for_mobile <?php echo escape_output($is_self_order_class)?'self_order_mode':'' ?>">
-            <div class="for-table-mode <?php echo escape_output($is_self_order_class)?'self_order_mode':'' ?>">
-                <?php if($is_self_order_class):?>
+        <div class="top_header_for_mobile <?php echo escape_output($is_self_order_class) ? 'self_order_mode' : '' ?>">
+            <div class="for-table-mode <?php echo escape_output($is_self_order_class) ? 'self_order_mode' : '' ?>">
+                <?php if ($is_self_order_class): ?>
                
-                <?php else:?>
+                <?php else: ?>
                     <button type="button" data-isActive="false" class="show_running_order bg__red">
                         <i class="far fa-bags-shopping"></i> <span><?php echo lang('running_order'); ?></span></button>
-                <?php endif;?>
+                <?php endif; ?>
 
 
                 <!-- End Running Order -->
@@ -809,35 +799,35 @@ foreach ($notifications as $single_notification){
 
 
                     <?php
-                    //for default order type select
+                    // for default order type select
                     $default_order_type = $this->session->userdata('default_order_type');
-                    $selected = (isset($waiter_app_status) && $waiter_app_status=="Yes"?'active_tmp_btn':(isset($default_order_type) && $default_order_type==1?'active_tmp_btn':''));
+                    $selected = (isset($waiter_app_status) && $waiter_app_status == 'Yes' ? 'active_tmp_btn' : (isset($default_order_type) && $default_order_type == 1 ? 'active_tmp_btn' : ''));
                     ?>
                     <div class="btn-list">
-                        <button class="tablet_btn type_temp_div <?php echo escape_output($selected)?>" data-id="1">
+                        <button class="tablet_btn type_temp_div <?php echo escape_output($selected) ?>" data-id="1">
                             <i class="fal fa-table"></i> <?php echo lang('dine'); ?>
                         </button>
                         <?php
-                        //for default order type select
+                        // for default order type select
                         $default_order_type = $this->session->userdata('default_order_type');
-                        $selected = (isset($default_order_type) && $default_order_type==2?'active_tmp_btn':'');
+                        $selected = (isset($default_order_type) && $default_order_type == 2 ? 'active_tmp_btn' : '');
                         ?>
-                        <button class="tablet_btn type_temp_div <?php echo escape_output($selected)?>"  data-id="2"><i class="fal fa-shopping-bag"></i>
+                        <button class="tablet_btn type_temp_div <?php echo escape_output($selected) ?>"  data-id="2"><i class="fal fa-shopping-bag"></i>
                             <?php echo lang('take_away'); ?></button>
                         <?php
-                        //for default order type select
+                        // for default order type select
                         $default_order_type = $this->session->userdata('default_order_type');
-                        $selected = (isset($default_order_type) && $default_order_type==3?'active_tmp_btn':'');
+                        $selected = (isset($default_order_type) && $default_order_type == 3 ? 'active_tmp_btn' : '');
                         ?>
                         <?php
-                        if(!isFoodCourt()):
+                        if (!isFoodCourt()):
                             ?>
-                            <button class="tablet_btn type_temp_div <?php echo escape_output($selected)?>"  data-id="3"><i class="fal fa-truck"></i>
+                            <button class="tablet_btn type_temp_div <?php echo escape_output($selected) ?>"  data-id="3"><i class="fal fa-truck"></i>
                                 <?php echo lang('delivery'); ?></button>
                             <?php
-                        elseif($this->session->userdata('role') == 'Admin'):
+                        elseif ($this->session->userdata('role') == 'Admin'):
                             ?>
-                            <button class="tablet_btn type_temp_div <?php echo escape_output($selected)?>" <?php echo escape_output($selected)?>  <?php echo escape_output($selected)?> data-id="3"><i class="fal fa-truck"></i>
+                            <button class="tablet_btn type_temp_div <?php echo escape_output($selected) ?>" <?php echo escape_output($selected) ?>  <?php echo escape_output($selected) ?> data-id="3"><i class="fal fa-truck"></i>
                                 <?php echo lang('delivery'); ?></button>
                             <?php
                         endif;
@@ -864,8 +854,8 @@ foreach ($notifications as $single_notification){
                     </button>
                 </div>
                 <?php
-                if(!isFoodCourt()):
-                ?>
+                if (!isFoodCourt()):
+                    ?>
                 <button type="button" id="waiter_open" class="bg__grey">
                     <i class="fal fa-knife-kitchen"></i> <span><?php echo lang('Waiter'); ?></span></button>
                 <?php
@@ -880,41 +870,42 @@ foreach ($notifications as $single_notification){
             </div>
             <!-- End Tablet Mode Options -->
             <div class="for-mobile-mode">
-                <?php if($is_self_order_class):?>
+                <?php if ($is_self_order_class): ?>
           
-                <?php else:?>
+                <?php else: ?>
                     <button type="button" data-isActive="false" class="show_running_order bg__red"><span><?php echo lang('running_order'); ?></span></button>
-                <?php endif;?>
+                <?php endif; ?>
 
 
                 <button type="button" class="show_cart_list bg__purple"><span><?php echo lang('Cart'); ?></span></button>
                 <button type="button" class="show_product bg__grey"> <span><?php echo lang('Products'); ?></span></button>
-                <?php if($is_self_order!="Yes" && $is_online_order=="Yes"):?>
+                <?php if ($is_self_order != 'Yes' && $is_online_order == 'Yes'): ?>
                     <button type="button" class="online_my_order bg__green"> <span><?php echo lang('My_Orders'); ?></span></button>
-                <?php else:?>
+                <?php else: ?>
 
-                    <?php if($is_self_order=="Yes" && $is_online_order!="Yes"):?>
+                    <?php if ($is_self_order == 'Yes' && $is_online_order != 'Yes'): ?>
                         <button type="button" class="self_my_order bg__green"> <span><?php echo lang('My_Orders'); ?></span></button>
-                    <?php endif?>
+                    <?php endif ?>
 
-                    <button type="button" class="show_all_menu bg__green  <?php echo escape_output($is_self_order_class) ?  $is_self_order_class : '' ?>">
+                    <button type="button" class="show_all_menu bg__green  <?php echo escape_output($is_self_order_class) ? $is_self_order_class : '' ?>">
                      <span><?php echo lang('Others'); ?></span></button>
-                <?php endif;?>
+                <?php endif; ?>
 
-                <?php if($is_online_order=="Yes"):
+                <?php
+                if ($is_online_order == 'Yes'):
                     ?>
-                    <button type="button" class="self_order_and_online_order online_order_before_login irp_my_orders plus_button plus_button_online_order bg__green" style="display:<?php echo escape_output($online_without_login)?>"> <span><?php echo lang('signup'); ?></span></button>
-                    <button type="button" class="self_order_and_online_order online_order_before_login irp_my_orders login_modal_btn bg__green" style="display:<?php echo escape_output($online_without_login)?>"> <span><?php echo lang('login'); ?></span></button>
-                    <button type="button"  data-title_custom="<?php echo lang('edit_profile'); ?>"  class="self_order_and_online_order online_order_after_login irp_my_orders edit_customer bg__green self_order_and_online_order_mobile" style="display:<?php echo escape_output($online_login)?>"> <span><?php echo lang('edit_profile'); ?></span></button>
-                    <button type="button" class="self_order_and_online_order online_order_after_login irp_my_orders online_my_order bg__green self_order_and_online_order_mobile" style="display:<?php echo escape_output($online_login)?>"> <span><?php echo lang('My_Orders'); ?></span></button>
-                    <button type="button" class="online_order_after_login irp_my_orders bg__red"  style="display:<?php echo escape_output($online_login)?>"> <span> <a href="<?php echo base_url();?>online_order_logout" class="logout_btn_online_order_css"> <?php echo lang('logout'); ?></a></span></button>
-                <?php endif;?>
+                    <button type="button" class="self_order_and_online_order online_order_before_login irp_my_orders plus_button plus_button_online_order bg__green" style="display:<?php echo escape_output($online_without_login) ?>"> <span><?php echo lang('signup'); ?></span></button>
+                    <button type="button" class="self_order_and_online_order online_order_before_login irp_my_orders login_modal_btn bg__green" style="display:<?php echo escape_output($online_without_login) ?>"> <span><?php echo lang('login'); ?></span></button>
+                    <button type="button"  data-title_custom="<?php echo lang('edit_profile'); ?>"  class="self_order_and_online_order online_order_after_login irp_my_orders edit_customer bg__green self_order_and_online_order_mobile" style="display:<?php echo escape_output($online_login) ?>"> <span><?php echo lang('edit_profile'); ?></span></button>
+                    <button type="button" class="self_order_and_online_order online_order_after_login irp_my_orders online_my_order bg__green self_order_and_online_order_mobile" style="display:<?php echo escape_output($online_login) ?>"> <span><?php echo lang('My_Orders'); ?></span></button>
+                    <button type="button" class="online_order_after_login irp_my_orders bg__red"  style="display:<?php echo escape_output($online_login) ?>"> <span> <a href="<?php echo base_url(); ?>online_order_logout" class="logout_btn_online_order_css"> <?php echo lang('logout'); ?></a></span></button>
+                <?php endif; ?>
 
             </div>
             <!-- End Mobile Mode Options -->
         </div>
         <div id="main_part">
-            <div class="left_item <?php echo escape_output($is_self_order_class) ? 'self_order_mode':'' ?>">
+            <div class="left_item <?php echo escape_output($is_self_order_class) ? 'self_order_mode' : '' ?>">
                 <div class="main_left  <?php echo escape_output($is_self_order_class) ?>">
                     <div class="holder">
                         <div id="running_order_header">
@@ -933,15 +924,16 @@ foreach ($notifications as $single_notification){
                             <?php
                             $display_btn_1 = 'ir_display_none';
                             $display_btn_2 = 'ir_display_none';
-                            if($pre_or_post_payment==1):
+                            if ($pre_or_post_payment == 1):
                                 $display_btn_1 = '';
-                              else:
+                            else:
                                 $display_btn_2 = '';
-                             endif; ?>
+                            endif;
+                            ?>
 
-                            <button class="operation_button <?php echo escape_output($display_btn_1)?>" id="modify_order"><i
+                            <button class="operation_button <?php echo escape_output($display_btn_1) ?>" id="modify_order"><i
                                         class="fas fa-edit"></i><?php echo lang('modify_order_'); ?></button>
-                            <button class="operation_button no-need-for-waiter fix <?php echo escape_output($display_btn_2)?>" id="close_order_button"><i
+                            <button class="operation_button no-need-for-waiter fix <?php echo escape_output($display_btn_2) ?>" id="close_order_button"><i
                                         class="fas fa-ban"></i>
                                 <?php echo lang('close_order'); ?></button>
                             
@@ -983,7 +975,7 @@ foreach ($notifications as $single_notification){
                             </div>
 
                             <?php
-                            if(isset($waiter_app_status) && $waiter_app_status=="Yes" && $getCompanyInfo->printing_kot!="web_browser_popup"):
+                            if (isset($waiter_app_status) && $waiter_app_status == 'Yes' && $getCompanyInfo->printing_kot != 'web_browser_popup'):
                                 ?>
                                 <button class="operation_button fix btn_tip full-width-for-waiter print_kot_button" data-tippy-content="<?php echo lang('print'); ?> <?php echo lang('KOT'); ?>"><i
                                             class="fas fa-print"></i>
@@ -992,7 +984,7 @@ foreach ($notifications as $single_notification){
                             endif;
                             ?>
                             <?php
-                            if(isset($waiter_app_status) && $waiter_app_status=="Yes" && $getCompanyInfo->printing_bill=="web_browser_popup"):
+                            if (isset($waiter_app_status) && $waiter_app_status == 'Yes' && $getCompanyInfo->printing_bill == 'web_browser_popup'):
                                 ?>
                                 <div class="ir_flex_jc_w94_pr">
                                     <button class="operation_button fix ir_calc_w98_m5 btn_tip full-width-for-waiter"
@@ -1001,7 +993,7 @@ foreach ($notifications as $single_notification){
                                     </button>
                                 </div>
                                 <?php
-                            elseif(isset($waiter_app_status) && $waiter_app_status=="Yes" && $getCompanyInfo->printing_bill!="web_browser_popup"):
+                            elseif (isset($waiter_app_status) && $waiter_app_status == 'Yes' && $getCompanyInfo->printing_bill != 'web_browser_popup'):
                                 ?>
                                 <div class="ir_flex_jc_w94_pr">
                                     <button class="operation_button fix ir_calc_w98_m5 btn_tip full-width-for-waiter"
@@ -1020,52 +1012,52 @@ foreach ($notifications as $single_notification){
 
                     </div>
                 </div>
-                <div class="main_middle" style="<?php echo escape_output($is_self_order_class)?'width: 100%;':'' ?>">
+                <div class="main_middle" style="<?php echo escape_output($is_self_order_class) ? 'width: 100%;' : '' ?>">
                     <div class="main_top">
                         <!-- Top Btn -->
-                        <div class="button_holder <?php echo escape_output($is_self_order_class) ?> <?php echo isset($is_self_order_class) && $is_self_order_class?'':'no-need-for-waiter' ?>">
+                        <div class="button_holder <?php echo escape_output($is_self_order_class) ?> <?php echo isset($is_self_order_class) && $is_self_order_class ? '' : 'no-need-for-waiter' ?>">
                             <?php
-                                //for default order type select
-                                    $default_order_type = $this->session->userdata('default_order_type');
-                                    $selected = (isset($waiter_app_status) && $waiter_app_status=="Yes"?'selected':(isset($default_order_type) && $default_order_type==1?'selected':''));
-                                    if($is_online_order=="Yes"){
-                                        $selected = '';
-                                    }
+                            // for default order type select
+                            $default_order_type = $this->session->userdata('default_order_type');
+                            $selected = (isset($waiter_app_status) && $waiter_app_status == 'Yes' ? 'selected' : (isset($default_order_type) && $default_order_type == 1 ? 'selected' : ''));
+                            if ($is_online_order == 'Yes') {
+                                $selected = '';
+                            }
                             ?>
                             <button class="selected__btn_c  <?php echo escape_output($is_self_order_class) ?> dine_in_button" data-id="dine_in_button"
-                                data-selected="<?php echo escape_output($selected)?>">
+                                data-selected="<?php echo escape_output($selected) ?>">
                                 <i class="fal fa-table"></i> <?php echo lang('dine'); ?>
                             </button>
 
                             <?php
-                                //for default order type select
+                            // for default order type select
                             $default_order_type = $this->session->userdata('default_order_type');
 
-                            $selected = (isset($default_order_type) && $default_order_type==2?'selected':'');
-                            if($is_online_order=="Yes"){
+                            $selected = (isset($default_order_type) && $default_order_type == 2 ? 'selected' : '');
+                            if ($is_online_order == 'Yes') {
                                 $selected = '';
                             }
                             ?>
-                            <button class="selected__btn_c  <?php echo escape_output($is_self_order_class) ?> take_away_button" data-selected="<?php echo escape_output($selected)?>" data-id="take_away_button"><i class="fal fa-shopping-bag"></i>
+                            <button class="selected__btn_c  <?php echo escape_output($is_self_order_class) ?> take_away_button" data-selected="<?php echo escape_output($selected) ?>" data-id="take_away_button"><i class="fal fa-shopping-bag"></i>
                                 <?php echo lang('take_away'); ?></button>
 
                             <?php
-                                //for default order type select
+                            // for default order type select
                             $default_order_type = $this->session->userdata('default_order_type');
-                            $selected = (isset($default_order_type) && $default_order_type==3?'selected':'');
-                            if($is_online_order=="Yes"){
+                            $selected = (isset($default_order_type) && $default_order_type == 3 ? 'selected' : '');
+                            if ($is_online_order == 'Yes') {
                                 $selected = '';
                             }
                             ?>
                             <?php
-                            if(!isFoodCourt()):
-                            ?>
-                                <button class="selected__btn_c  <?php echo escape_output($is_self_order_class) ?> delivery_button" data-selected="<?php echo escape_output($selected)?>" data-id="delivery_button"><i class="fal fa-truck"></i>
+                            if (!isFoodCourt()):
+                                ?>
+                                <button class="selected__btn_c  <?php echo escape_output($is_self_order_class) ?> delivery_button" data-selected="<?php echo escape_output($selected) ?>" data-id="delivery_button"><i class="fal fa-truck"></i>
                                     <?php echo lang('delivery'); ?></button>
                             <?php
-                            elseif($this->session->userdata('role') == 'Admin'):
-                            ?>
-                                <button class="selected__btn_c  <?php echo escape_output($is_self_order_class) ?> delivery_button" data-selected="<?php echo escape_output($selected)?>" data-id="delivery_button"><i class="fal fa-truck"></i>
+                            elseif ($this->session->userdata('role') == 'Admin'):
+                                ?>
+                                <button class="selected__btn_c  <?php echo escape_output($is_self_order_class) ?> delivery_button" data-selected="<?php echo escape_output($selected) ?>" data-id="delivery_button"><i class="fal fa-truck"></i>
                                     <?php echo lang('delivery'); ?></button>
                             <?php
                             endif;
@@ -1075,55 +1067,55 @@ foreach ($notifications as $single_notification){
                                 <button class="<?php echo escape_output($is_self_order_class) ?>" id="table_button"><i class="fal fa-table"></i> <?php echo lang('table'); ?></button>
                             <?php endif; ?>
                         </div>
-                        <?php if($is_self_order=="Yes" && $is_online_order!="Yes"):?>
+                        <?php if ($is_self_order == 'Yes' && $is_online_order != 'Yes'): ?>
                             <div class="self_order_table_person_wrapper">
-                                <input class="self_order_table_person" id="self_order_table_person" type="number" min="1"  placeholder="<?php echo lang('Table_Person')?>" value="" >
+                                <input class="self_order_table_person" id="self_order_table_person" type="number" min="1"  placeholder="<?php echo lang('Table_Person') ?>" value="" >
                             </div>
-                            <?php endif;?>
+                            <?php endif; ?>
                     </div>
                     <!-- End Top Btn -->
 
                     <div class="waiter_customer">
-                        <div class="left_item <?php echo escape_output($is_self_order_class) ?> <?php echo isFoodCourt()?'isFoodCourt':''?>">
+                        <div class="left_item <?php echo escape_output($is_self_order_class) ?> <?php echo isFoodCourt() ? 'isFoodCourt' : '' ?>">
                                 <?php
-                                    if($waiter_app_status=="Yes"):
-                                if($is_self_order!="Yes"):
-                                ?>
-                                <input type="hidden" value="<?php echo escape_output($this->session->userdata('user_id'))?>" id="select_waiter">
-                                <input type="hidden" value="<?php echo escape_output($this->session->userdata('full_name'))?>" id="select_waiter_name">
-                                    <?php else:?>
+                                if ($waiter_app_status == 'Yes'):
+                                    if ($is_self_order != 'Yes'):
+                                        ?>
+                                <input type="hidden" value="<?php echo escape_output($this->session->userdata('user_id')) ?>" id="select_waiter">
+                                <input type="hidden" value="<?php echo escape_output($this->session->userdata('full_name')) ?>" id="select_waiter_name">
+                                    <?php else: ?>
                                         <select id="select_waiter" class="select2 select_waiter ir_w92_ml" disabled>
-                                            <option value=""><?php  echo lang('waiter'); ?></option>
+                                            <option value=""><?php echo lang('waiter'); ?></option>
                                             <!--This variable could not be escaped because this is html content-->
                                             <?php echo ($waiters_option); ?>
                                         </select>
-                                    <?php endif;?>
+                                    <?php endif; ?>
 
                                 <button id="table_button" class="half-width-98"><i class="fal fa-table"></i>
                                     <?php echo lang('table'); ?></button>
                                 <?php
                                 else:
-                                    if(!isFoodCourt()):
-                                ?>
+                                    if (!isFoodCourt()):
+                                        ?>
                                 <select id="select_waiter" class="select2 select_waiter ir_w92_ml" disabled>
-                                    <option value=""><?php  echo lang('waiter'); ?></option>
+                                    <option value=""><?php echo lang('waiter'); ?></option>
                                     <!--This variable could not be escaped because this is html content-->
                                     <?php echo ($waiters_option); ?>
                                 </select>
                                         <?php
-                                  else:
-                                      if($is_self_order!="Yes"):
-                                    ?>
-                                      <input type="hidden" value="<?php echo escape_output($this->session->userdata('user_id'))?>" id="select_waiter">
-                                      <input type="hidden" value="<?php echo escape_output($this->session->userdata('full_name'))?>" id="select_waiter_name">
-                                          <?php else:?>
+                                    else:
+                                        if ($is_self_order != 'Yes'):
+                                            ?>
+                                      <input type="hidden" value="<?php echo escape_output($this->session->userdata('user_id')) ?>" id="select_waiter">
+                                      <input type="hidden" value="<?php echo escape_output($this->session->userdata('full_name')) ?>" id="select_waiter_name">
+                                          <?php else: ?>
                                               <select id="select_waiter" class="select2 select_waiter ir_w92_ml" disabled>
-                                                  <option value=""><?php  echo lang('waiter'); ?></option>
+                                                  <option value=""><?php echo lang('waiter'); ?></option>
                                                   <!--This variable could not be escaped because this is html content-->
                                                   <?php echo ($waiters_option); ?>
                                               </select>
                                       <?php
-                                          endif;
+                                        endif;
                                     endif;
                                     ?>
                                 <?php
@@ -1150,7 +1142,7 @@ foreach ($notifications as $single_notification){
                         </div>
                     </div>
 
-                    <div class="main_center <?php echo escape_output($is_self_order_class) ? 'self_order_mode': '' ?> <?php echo escape_output($mobile_responsive_checker_online_order) ? 'irp_online_order': '' ?> <?php echo escape_output($mobile_responsive_checker_self_order) ? 'irp_self_order': '' ?>">
+                    <div class="main_center <?php echo escape_output($is_self_order_class) ? 'self_order_mode' : '' ?> <?php echo escape_output($mobile_responsive_checker_online_order) ? 'irp_online_order' : '' ?> <?php echo escape_output($mobile_responsive_checker_self_order) ? 'irp_self_order' : '' ?>">
                         <div class="order_table_holder">
                             <div class="order_table_header_row">
                                 <div class="single_header_column" id="single_order_item"><?php echo lang('item'); ?>
@@ -1177,23 +1169,24 @@ foreach ($notifications as $single_notification){
                                         class="no-need-for-waiter fal fa-calendar-alt input-group date datepicker_custom" id="open_date_picker"></i> -->
                                    <!-- <i id="cart_item_option_open" class="fal fa-eye"></i> -->
  <?php echo lang('total_payable'); ?>:
-                                    <span class="color_div mrgin_3 color_div" id="total_payable"><?php echo getAmtP(0)?></span>
+                                    <span class="color_div mrgin_3 color_div" id="total_payable"><?php echo getAmtP(0) ?></span>
                                 </h1>
                             </div>
                             <div class="main_bottom">
-                                <div class="button_group <?php echo escape_output($is_self_order_class) ? 'self_order_mode': '' ?>">
+                                <input type="hidden" id="token_number_hidden_unused" name="token_number">
+                                <div class="button_group <?php echo escape_output($is_self_order_class) ? 'self_order_mode' : '' ?>">
 
                                     <button id="cancel_button"><i class="fas fa-times"></i>
                                         <?php echo lang('cancel'); ?></button>
                                    
-                                    <button data-type="1" class="<?php echo escape_output(isset($is_online_order) && $is_online_order=="Yes"?'self_order_skip':'')?> <?php echo escape_output(isset($is_self_order) && $is_self_order=="Yes"?'self_order_skip':'')?> placeOrderSound place_order_operation <?php echo isset($place_order_tooltip) && $place_order_tooltip=="show"?"btn_tip":'' ?>"  data-tippy-content="<?php echo lang('place_order_tooltip_txt'); ?>"><i
+                                    <button data-type="1" class="<?php echo escape_output(isset($is_online_order) && $is_online_order == 'Yes' ? 'self_order_skip' : '') ?> <?php echo escape_output(isset($is_self_order) && $is_self_order == 'Yes' ? 'self_order_skip' : '') ?> placeOrderSound place_order_operation <?php echo isset($place_order_tooltip) && $place_order_tooltip == 'show' ? 'btn_tip' : '' ?>"  data-tippy-content="<?php echo lang('place_order_tooltip_txt'); ?>"><i
                                             class="fas fa-utensils"></i> <span
                                            ><?php echo lang('direct_invoice'); ?></span></button>
 
                                     <!-- Hide Place Order Button -->
 									<input type="hidden" id="finalize_clicked_once" value="no">
                                     <?php if (false): ?>
-                                        <button data-type="2" class="placeOrderSound place_order_operation <?php echo isset($place_order_tooltip) && $place_order_tooltip=="show"?"btn_tip":'' ?>"  data-tippy-content="<?php echo lang('place_order_tooltip_txt'); ?>"><i
+                                        <button data-type="2" class="placeOrderSound place_order_operation <?php echo isset($place_order_tooltip) && $place_order_tooltip == 'show' ? 'btn_tip' : '' ?>"  data-tippy-content="<?php echo lang('place_order_tooltip_txt'); ?>"><i
                                             class="fas fa-utensils"></i> <span
                                             id="place_edit_order"><?php echo lang('place_order'); ?></span></button>
                                     <?php endif; ?>
@@ -1204,9 +1197,9 @@ foreach ($notifications as $single_notification){
                     </div>
                 </div>
             </div>
-            <div class="main_right <?php echo escape_output($is_self_order_class) ? 'online_order':'' ?>">
+            <div class="main_right <?php echo escape_output($is_self_order_class) ? 'online_order' : '' ?>">
                 <form autocomplete="off" class="search-category-form" id="search_form">
-                    <?php  if(isFoodCourt() && $this->session->userdata('role') != 'Admin'):?>
+                    <?php if (isFoodCourt() && $this->session->userdata('role') != 'Admin'): ?>
                     <div class="search-category-item">
                         <div class="item">
                             <input class="" type="text" name="search" id="search"
@@ -1218,17 +1211,17 @@ foreach ($notifications as $single_notification){
                                     $outlets = getAllOutlestByAssignFood();
                                     foreach ($outlets as $value):
                                         ?>
-                                        <option <?= set_select('outlet_id',$value->id)?>  <?= isset($outlet_id_s) && $outlet_id_s==$value->id?'selected':''?> data-company_id="<?php echo escape_output($value->company_id)?>" value="<?php echo escape_output($value->id) ?>"><?php echo escape_output($value->outlet_name) ?></option>
+                                        <option <?= set_select('outlet_id', $value->id) ?>  <?= isset($outlet_id_s) && $outlet_id_s == $value->id ? 'selected' : '' ?> data-company_id="<?php echo escape_output($value->company_id) ?>" value="<?php echo escape_output($value->id) ?>"><?php echo escape_output($value->outlet_name) ?></option>
                                         <?php
                                     endforeach;
                                     ?>
                                 </select>
                         </div>
                     </div>
-                    <?php else:   ?>
+                    <?php else: ?>
                         <input class="ir_w_m_b_4" type="text" name="search" id="search"
                                placeholder="<?php echo lang('name_code_cat_veg_bev_bar'); ?>" />
-                    <?php endif;   ?>
+                    <?php endif; ?>
                     <div class="cat-list-wrapper">
                         <button type="button" class="bg__purple open-category-list">
                             <?php echo lang('category'); ?> <i class="fas fa-angle-down"></i>
@@ -1239,7 +1232,7 @@ foreach ($notifications as $single_notification){
                                         <a href="#" class="button_category_show_all1"><?php echo lang('all'); ?></a>
                                     </li>
                                 <!--This variable could not be escaped because this is html content-->
-                                    <?php echo ($cateogry_slide_to_show)?>
+                                    <?php echo ($cateogry_slide_to_show) ?>
                             </ul>
 
                     </div>
@@ -1252,7 +1245,7 @@ foreach ($notifications as $single_notification){
                                 <a href="#" class="button_category_show_all1"><?php echo lang('all'); ?></a>
                             </li>
                             <!--This variable could not be escaped because this is html content-->
-                            <?php echo ($cateogry_slide_to_show)?>
+                            <?php echo ($cateogry_slide_to_show) ?>
                         </ul>
                     </div>
 
@@ -1277,7 +1270,7 @@ foreach ($notifications as $single_notification){
                     <a href="#" id="notification_button">
                         <i class="fal fa-bell"></i> <?php echo lang('kitchen_notification'); ?>
                         <span id="notification_counter"
-                            class="c_badge <?php echo escape_output($notification_number)?'':'txt_11'?>"><?php echo escape_output($notification_number);?></span>
+                            class="c_badge <?php echo escape_output($notification_number) ? '' : 'txt_11' ?>"><?php echo escape_output($notification_number); ?></span>
                     </a>
                 </li>
                 <li>
@@ -1289,7 +1282,7 @@ foreach ($notifications as $single_notification){
                     <a href="#" class="show__cat__list"><i class="far fa-file-alt"></i> <?php echo lang('category'); ?></a>
                     <ul class="sub_menu category__list">
                         <!--This variable could not be escaped because this is html content-->
-                        <?php echo ($cateogry_slide_to_show)?>
+                        <?php echo ($cateogry_slide_to_show) ?>
                     </ul>
                 </li>
                 <li><a href="#" data-status="bev" class="veg_bev_item"><i class="far fa-glass"></i> <?php echo lang('beverage_items'); ?></a></li>
@@ -1324,15 +1317,17 @@ foreach ($notifications as $single_notification){
                         <i class="fal fa-globe"></i> <?php echo lang('language'); ?>
                     </a>
                     <ul class="sub_menu" role="menu">
-                        <?php $language = $this->session->userdata('language');
-                            if(!$language){
-                                $language = "english";
-                            }
-                            ?>
-                        <?php $dir = glob("application/language/*",GLOB_ONLYDIR);
-                            foreach ($dir as $value): $separete = explode("language/",$value); ?>
-                        <li class="<?=isset($language) && $language==$separete[1]?'active_lng':''?>"><a
-                                href="<?php echo base_url(); ?>Authentication/setlanguagePOS/<?=escape_output($separete[1])?>"><?php echo escape_output(ucfirst     ($separete[1]))?></a>
+                        <?php
+                        $language = $this->session->userdata('language');
+                        if (!$language) {
+                            $language = 'english';
+                        }
+                        ?>
+                        <?php $dir = glob('application/language/*', GLOB_ONLYDIR);
+                        foreach ($dir as $value):
+                            $separete = explode('language/', $value); ?>
+                        <li class="<?= isset($language) && $language == $separete[1] ? 'active_lng' : '' ?>"><a
+                                href="<?php echo base_url(); ?>Authentication/setlanguagePOS/<?= escape_output($separete[1]) ?>"><?php echo escape_output(ucfirst($separete[1])) ?></a>
                         </li> <?php endforeach; ?>
                     </ul>
                 </li>
@@ -1346,15 +1341,15 @@ foreach ($notifications as $single_notification){
                     </a>
                     <ul class="sub_menu" role="menu">
                         <li>
-                            <a href="<?php echo base_url();?>Authentication/userProfile">
+                            <a href="<?php echo base_url(); ?>Authentication/userProfile">
                                 <?php echo lang('my_profile'); ?></a>
                         </li>
                         <li>
-                            <a href="<?php echo base_url();?>Authentication/changePassword">
+                            <a href="<?php echo base_url(); ?>Authentication/changePassword">
                                 <?php echo lang('change_password'); ?></a>
                         </li>
                         <li>
-                            <a href="<?php echo base_url();?>Authentication/logOut"><?php echo lang('logout'); ?></a>
+                            <a href="<?php echo base_url(); ?>Authentication/logOut"><?php echo lang('logout'); ?></a>
                         </li>
                     </ul>
                 </li>
@@ -1362,40 +1357,40 @@ foreach ($notifications as $single_notification){
                     <a href="javascript:void(0)" id="print_last_invoice">
                         <i class="fal fa-print"></i> <?php echo lang('print_last_invoice'); ?></a>
                 </li>
-                <?php    if($designation!="Waiter"):?>
+                <?php if ($designation != 'Waiter'): ?>
                     <li class="no-need-for-waiter">
                         <a href="#" class="register_details">
                             <i class="fal fa-registered"></i> <?php echo lang('register_details'); ?>
                         </a>
                     </li>
-                <?php endif;?>
+                <?php endif; ?>
                 <li class="no-need-for-waiter">
                     <a href="#" id="go_to_dashboard">
                         <i class="fal fa-tachometer-alt-fast"></i> <?php
-                                    if ($this->session->userdata('role') == 'Admin') {
-                                        echo lang('dashboard');
-                                    }else{
-                                        echo lang('back');
-                                    }
-                                    ?>
+if ($this->session->userdata('role') == 'Admin') {
+    echo lang('dashboard');
+} else {
+    echo lang('back');
+}
+?>
                     </a>
                 </li>
                 <li>
-                    <a href="<?php echo base_url()?>customer-panel" class="header_menu_icon" target="_blank"  data-tippy-content="<?php
-                    echo lang('customer_panel');
-                    ?>">
+                    <a href="<?php echo base_url() ?>customer-panel" class="header_menu_icon" target="_blank"  data-tippy-content="<?php
+echo lang('customer_panel');
+?>">
                         <i class="fal fa-desktop"></i> <?php
-                        echo lang('customer_panel');
-                        ?>
+echo lang('customer_panel');
+?>
                     </a>
                 </li>
                 <li>
-                    <a href="<?php echo base_url()?>order-status-screen" class="header_menu_icon" target="_blank"  data-tippy-content="<?php
-                    echo lang('order_status_screen');
-                    ?>">
+                    <a href="<?php echo base_url() ?>order-status-screen" class="header_menu_icon" target="_blank"  data-tippy-content="<?php
+echo lang('order_status_screen');
+?>">
                         <i class="fa fa-desktop"></i> <?php
-                        echo lang('order_status_screen');
-                        ?>
+echo lang('order_status_screen');
+?>
                     </a>
                 </li>
                 <!-- <li>
@@ -1449,21 +1444,22 @@ foreach ($notifications as $single_notification){
             <div>
                 <div class="left_item">
                     <?php
-                        if($waiter_app_status=="Yes"):
-                    ?>
+                    if ($waiter_app_status == 'Yes'):
+                        ?>
                     <input type="hidden"
-                        value="<?php echo escape_output($this->session->userdata('user_id'))?>"
+                        value="<?php echo escape_output($this->session->userdata('user_id')) ?>"
                         id="select_waiter">
                     <button id="table_button" class="half-width-98"><i class="fal fa-table"></i>
                         <?php echo lang('table'); ?></button>
-                    <?php else:
-                            ?>
+                    <?php
+                    else:
+                    ?>
                     <select id="select_waiter1" class="select2 select_waiter ir_w92_ml">
-                        <option value=""><?php  echo lang('waiter'); ?></option>
+                        <option value=""><?php echo lang('waiter'); ?></option>
                         <!--This variable could not be escaped because this is html content-->
                         <?php echo ($waiters_option); ?>
                     </select>
-                  <?php endif;?>
+                  <?php endif; ?>
                 </div>
             </div>
             <div class="btn__box">
@@ -1489,7 +1485,7 @@ foreach ($notifications as $single_notification){
 
                 <div class="item">
                                     <input type="hidden" id="open_invoice_date_hidden"
-                                        value="<?php echo date("Y-m-d") ?>">
+                                        value="<?php echo date('Y-m-d') ?>">
                                     <div><?php echo lang('total_item'); ?>: <span
                                             id="total_items_in_cart_with_quantity">0</span>
 
@@ -1498,50 +1494,51 @@ foreach ($notifications as $single_notification){
                 </div>
                 <div class="item">
                                     <span><?php echo lang('sub_total'); ?>:</span>
-                                    <span id="sub_total_show"><?php echo getAmtP(0)?></span>
-                                    <span id="sub_total" class="ir_display_none"><?php echo getAmtP(0)?></span>
+                                    <span id="sub_total_show"><?php echo getAmtP(0) ?></span>
+                                    <span id="sub_total" class="ir_display_none"><?php echo getAmtP(0) ?></span>
                                     <span id="total_item_discount" class="ir_display_none">0</span>
                                     <span id="discounted_sub_total_amount"
-                                        class="ir_display_none"><?php echo getAmtP(0)?></span>
+                                        class="ir_display_none"><?php echo getAmtP(0) ?></span>
                 </div>
-                <?php if (false) : ?>
+                <?php if (false): ?>
                     <!-- Hide Whole Cart Discount -->
                     <div class="item no-need-for-waiter <?php echo escape_output($is_self_order_class) ?>">
                                         <span>
                                             <?php echo lang('discount'); ?>: <i class="fal fa-edit"
                                                 id="open_discount_modal"></i> <span
-                                                id="show_discount_amount"><?php echo getAmtP(0)?></span>
+                                                id="show_discount_amount"><?php echo getAmtP(0) ?></span>
                                         </span>
                     </div>
                 <?php endif; ?>
                 <div class="item">
                                     <span><?php echo lang('total'); ?> <?php echo lang('discount'); ?>:</span>
-                                    <span id="all_items_discount"><?php echo getAmtP(0)?></span>
+                                    <span id="all_items_discount"><?php echo getAmtP(0) ?></span>
                 </div>
                 <div class="item">
                     <span><?php echo lang('vat'); ?>:</span>
                     <span>
                         <i class="fal fa-eye no-need-for-waiter" id="open_tax_modal"></i>
                     </span>
-                    <span id="show_vat_modal"><?php echo getAmtP(0)?></span>
+                    <span id="show_vat_modal"><?php echo getAmtP(0) ?></span>
                 </div>
                 <div class="item">
                                     <span><?php echo lang('delivery_charge'); ?>: <i
                                             class="fal fa-edit no-need-for-waiter" id="open_charge_modal"></i> <span
-                                            id="show_charge_amount"><?php echo getAmtP(0)?></span></span>
+                                            id="show_charge_amount"><?php echo getAmtP(0) ?></span></span>
 
                 </div>
 
                 <div class="item <?php echo escape_output($is_self_order_class) ?>">
                     <span><?php echo lang('tips'); ?>: <i class="fal fa-edit no-need-for-waiter" id="open_tips_modal"></i>
-                    <span id="show_tips_amount"><?php echo getAmtP(0)?></span></span>
+                    <span id="show_tips_amount"><?php echo getAmtP(0) ?></span></span>
                 </div>
                 <?php
-                $is_rounding_enable = $this->session->userdata('is_rounding_enable');?>
-                <div class="item <?php echo escape_output($is_rounding_enable) && $is_rounding_enable==1?'':'ir_display_none'?>">
+                $is_rounding_enable = $this->session->userdata('is_rounding_enable');
+                ?>
+                <div class="item <?php echo escape_output($is_rounding_enable) && $is_rounding_enable == 1 ? '' : 'ir_display_none' ?>">
                     <input type="hidden" value="0" id="rounding_amount_hidden">
                     <span><?php echo lang('Rounding'); ?>:
-                    <span id="rounding_amount"><?php echo getAmtP(0)?></span></span>
+                    <span id="rounding_amount"><?php echo getAmtP(0) ?></span></span>
                 </div>
             </div>
             <div class="btn__box">
@@ -1626,10 +1623,10 @@ foreach ($notifications as $single_notification){
                 <label for="charge_type"><?php echo lang('who_will_pull_the_order'); ?></label>
                 <select id="pull_id" class="select2">
                     <?php
-                        $user_id = $this->session->userdata('user_id');
-                        foreach ($users as $value):
-                    ?>
-                        <option <?php echo $value->id==$user_id?'selected':''?> value="<?php echo escape_output($value->id)?>"><?php echo escape_output($value->full_name)?> - <?php echo escape_output($value->designation)?></option>
+                    $user_id = $this->session->userdata('user_id');
+                    foreach ($users as $value):
+                        ?>
+                        <option <?php echo $value->id == $user_id ? 'selected' : '' ?> value="<?php echo escape_output($value->id) ?>"><?php echo escape_output($value->full_name) ?> - <?php echo escape_output($value->designation) ?></option>
                     <?php
                     endforeach;
                     ?>
@@ -1656,31 +1653,31 @@ foreach ($notifications as $single_notification){
             <div class="main-content-wrapper">
                 <div>
                     <?php
-                        $service_amount = $this->session->userdata('service_amount');
-                        $delivery_amount = $this->session->userdata('delivery_amount');
-                    //for default order type select
-                        $default_order_type = $this->session->userdata('default_order_type');
+                    $service_amount = $this->session->userdata('service_amount');
+                    $delivery_amount = $this->session->userdata('delivery_amount');
+                    // for default order type select
+                    $default_order_type = $this->session->userdata('default_order_type');
+                    $check_type_selected = 'service';
+                    $amount_default = '';
+                    if ($default_order_type == 1) {
+                        $amount_default = $service_amount;
                         $check_type_selected = 'service';
-                        $amount_default = '';
-                        if($default_order_type==1){
-                            $amount_default = $service_amount;
-                            $check_type_selected = "service";
-                        }
-                        if($default_order_type==3){
-                            $amount_default = $delivery_amount;
-                            $check_type_selected = "delivery";
-                        }
+                    }
+                    if ($default_order_type == 3) {
+                        $amount_default = $delivery_amount;
+                        $check_type_selected = 'delivery';
+                    }
                     ?>
                     <label for="charge_type"><?php echo lang('type'); ?></label>
                     <select id="charge_type" class="select2">
-                        <option <?php echo isset($check_type_selected) && $check_type_selected=="delivery"?'selected':''?> value="delivery"><?php echo lang('delivery'); ?></option>
-                        <option <?php echo isset($check_type_selected) && $check_type_selected=="service"?'selected':''?> value="service"><?php echo lang('service'); ?></option>
+                        <option <?php echo isset($check_type_selected) && $check_type_selected == 'delivery' ? 'selected' : '' ?> value="delivery"><?php echo lang('delivery'); ?></option>
+                        <option <?php echo isset($check_type_selected) && $check_type_selected == 'service' ? 'selected' : '' ?> value="service"><?php echo lang('service'); ?></option>
                     </select>
                 </div>
                 <div>
                     <label for="charge_amount"><?php echo lang('amount'); ?></label>
                     <input type="text" name="" autocomplete="off" class="special_textbox " onfocus="select();"
-                        placeholder="<?php echo lang('amount'); ?>" value="<?php echo escape_output($amount_default)?>" id="delivery_charge" />
+                        placeholder="<?php echo lang('amount'); ?>" value="<?php echo escape_output($amount_default) ?>" id="delivery_charge" />
                 </div>
             </div>
             <div class="btn__box">
@@ -1836,8 +1833,8 @@ foreach ($notifications as $single_notification){
                                 data-tippy-content="<?php echo lang('txt_err_pos_6'); ?>"
                                 class="fal fa-question-circle tooltip_modifier"></i></p><input type="text" name=""
                                                                                                onfocus="select();"
-                        <?php echo isset($waiter_app_status) && $waiter_app_status=="Yes"?"readonly":'' ?>
-                                                                                               id="modal_discount"  class="<?php echo isset($is_discount) && $is_discount=="Yes"?"numpad_input_":'' ?>" placeholder="<?php echo lang('amt_or_p'); ?>" />
+                        <?php echo isset($waiter_app_status) && $waiter_app_status == 'Yes' ? 'readonly' : '' ?>
+                                                                                               id="modal_discount"  class="<?php echo isset($is_discount) && $is_discount == 'Yes' ? 'numpad_input_' : '' ?>" placeholder="<?php echo lang('amt_or_p'); ?>" />
                 </div>
                 <div class="section4 fix"><?php echo lang('total'); ?>&nbsp;&nbsp;&nbsp;
                     <span id="modal_total_price">0</span>
@@ -1896,20 +1893,20 @@ foreach ($notifications as $single_notification){
                             <input type="email" placeholder="<?php echo lang('email'); ?>" class="add_customer_modal_input" id="customer_email_modal">
                         </div>
                        <?php
-                       $online_login = 'none';
-                       $online_login_hide = 'none';
-                        if($is_online_order=="Yes"){
-                            $online_login = "";
-                        }else{
-                            $online_login_hide = '';
-                        }
-                        ?>
-                        <div class="customer_section" style="display:<?php echo escape_output($online_login)?>">
+$online_login = 'none';
+$online_login_hide = 'none';
+if ($is_online_order == 'Yes') {
+    $online_login = '';
+} else {
+    $online_login_hide = '';
+}
+?>
+                        <div class="customer_section" style="display:<?php echo escape_output($online_login) ?>">
                             <p class="input_level"><?php echo lang('password'); ?><span class="ir_color_red">*</span> <small>(<?php echo lang('keep_blank_in_edit'); ?>)</small></p>
                             <input type="email" placeholder="<?php echo lang('password'); ?>" class="add_customer_modal_input" id="customer_password_modal">
                         </div>
 
-                        <?php if(collectGST()=="Yes"){?>
+                        <?php if (collectGST() == 'Yes') { ?>
                             <div class="customer_section">
                                 <p class="input_level"><?php echo lang('same_or_diff_state'); ?></p>
                                 <select class="form-control irp_width_100 select2 same_or_diff_state_modal" name="same_or_diff_state" id="same_or_diff_state">
@@ -1932,12 +1929,12 @@ foreach ($notifications as $single_notification){
                             <input type="datable" class="add_customer_modal_input" autocomplete="off"
                                 id="customer_doa_modal" data-datable="yyyymmdd" data-datable-divider=" - ">
                         </div>
-                        <div class="customer_section" style="display:<?php echo escape_output($online_login_hide)?>">
+                        <div class="customer_section" style="display:<?php echo escape_output($online_login_hide) ?>">
                             <p class="input_level"><?php echo lang('default_discount'); ?></p>
                             <input type="text" class="add_customer_modal_input" placeholder="<?php echo lang('default_discount_pl'); ?>" autocomplete="off"
                                    id="customer_default_discount_modal">
                         </div>
-                        <?php if(collectGST()=="Yes"){?>
+                        <?php if (collectGST() == 'Yes') { ?>
                             <div class="customer_section">
                                 <p class="input_level"><?php echo lang('gst_number'); ?></p>
                                 <input type="text" placeholder="<?php echo lang('gst_number'); ?>" class="add_customer_modal_input" id="customer_gst_number_modal">
@@ -1983,10 +1980,10 @@ foreach ($notifications as $single_notification){
                 </a>
             </h1>
             
-  <?php 
-                $table_bg_color = $this->session->userdata('table_bg_color');
-                $bg_tbl = $table_bg_color;
-            ?>
+  <?php
+$table_bg_color = $this->session->userdata('table_bg_color');
+$bg_tbl = $table_bg_color;
+?>
             <div class="select_table_modal_info_holder2">
                 
                 <!--This variable could not be escaped because this is html content-->
@@ -1994,16 +1991,16 @@ foreach ($notifications as $single_notification){
                     <h4 class="bg-white text-center pos_mb_10"><b><?php echo lang('area'); ?></b></h4>
                     <ul class="dineIn-table-list-of-item">
                          <?php
-                            $i = 1;
-                            foreach ($areas as $value) {
-                                $set_active = "";
-                                if($i==1){
-                                    $set_active = "#dadada;";
-                                }
-                                $i++;
-                                echo '<li><div class="set_design ir_display_none">'.$value->table_design_content.'</div><a class="get_area_table" data-floor_bg_color="'.$value->floor_bg_color.'"  data-ordered_border_color="'.$value->ordered_border_color.'"  data-ordered_bg_color="'.$value->ordered_bg_color.'"  data-ordered_text_color="'.$value->ordered_text_color.'" data-id="'.$value->id.'" href="javascript:void(0)">'.$value->area_name.'</a></li>';
-                            }
-                        ?>
+$i = 1;
+foreach ($areas as $value) {
+    $set_active = '';
+    if ($i == 1) {
+        $set_active = '#dadada;';
+    }
+    $i++;
+    echo '<li><div class="set_design ir_display_none">' . $value->table_design_content . '</div><a class="get_area_table" data-floor_bg_color="' . $value->floor_bg_color . '"  data-ordered_border_color="' . $value->ordered_border_color . '"  data-ordered_bg_color="' . $value->ordered_bg_color . '"  data-ordered_text_color="' . $value->ordered_text_color . '" data-id="' . $value->id . '" href="javascript:void(0)">' . $value->area_name . '</a></li>';
+}
+?>
                     </ul>
 
                     <p>&nbsp;</p>
@@ -2019,7 +2016,7 @@ foreach ($notifications as $single_notification){
 
                 </div>
                 <div class="width_86">
-                    <div class="all-dineIn-table bg-white pos_ml_10 table_bg <?php echo $bg_tbl?>">
+                    <div class="all-dineIn-table bg-white pos_ml_10 table_bg <?php echo $bg_tbl ?>">
                         
                     </div>
                 </div>
@@ -2126,20 +2123,20 @@ foreach ($notifications as $single_notification){
                                             </div>
                                             <div class="item">
                                                 <span><?php echo lang('sub_total'); ?>: </span>
-                                                <span id="sub_total_show_hold"><?php echo getAmtP(0)?></span>
+                                                <span id="sub_total_show_hold"><?php echo getAmtP(0) ?></span>
                                                 <span id="sub_total_hold"
-                                                    class="ir_display_none"><?php echo getAmtP(0)?></span>
+                                                    class="ir_display_none"><?php echo getAmtP(0) ?></span>
                                                 <span id="total_item_discount_hold"
-                                                    class="ir_display_none"><?php echo getAmtP(0)?></span>
+                                                    class="ir_display_none"><?php echo getAmtP(0) ?></span>
                                                 <span id="discounted_sub_total_amount_hold"
-                                                    class="ir_display_none"><?php echo getAmtP(0)?></span>
+                                                    class="ir_display_none"><?php echo getAmtP(0) ?></span>
                                             </div>
                                             <div class="item">
                                                 <span><?php echo lang('discount'); ?>: </span>
                                                 <span>
-                                                    <span id="sub_total_discount_hold"><?php echo getAmtP(0)?></span><span
+                                                    <span id="sub_total_discount_hold"><?php echo getAmtP(0) ?></span><span
                                                         id="sub_total_discount_amount_hold"
-                                                        class="ir_display_none"><?php echo getAmtP(0)?></span>
+                                                        class="ir_display_none"><?php echo getAmtP(0) ?></span>
                                                 </span>
                                             </div>
                                         </div>
@@ -2149,25 +2146,25 @@ foreach ($notifications as $single_notification){
                                         <div class="single_row forth">
                                             <div class="item">
                                                 <span><?php echo lang('total_discount'); ?>: </span>
-                                                <span id="all_items_discount_hold"><?php echo getAmtP(0)?></span>
+                                                <span id="all_items_discount_hold"><?php echo getAmtP(0) ?></span>
                                             </div>
                                             <div class="item">
                                                 <span><?php echo lang('vat'); ?>: </span>
-                                                <span id="all_items_vat_hold"><?php echo getAmtP(0)?></span>
+                                                <span id="all_items_vat_hold"><?php echo getAmtP(0) ?></span>
                                             </div>
                                             <div class="item">
                                                 <span><?php echo lang('delivery_charge'); ?>: </span>
-                                                <span id="delivery_charge_hold"><?php echo getAmtP(0)?></span>
+                                                <span id="delivery_charge_hold"><?php echo getAmtP(0) ?></span>
                                             </div>
                                             <div class="item">
                                                 <span><?php echo lang('tips'); ?>: </span>
-                                                <span id="tips_amount_hold"><?php echo getAmtP(0)?></span>
+                                                <span id="tips_amount_hold"><?php echo getAmtP(0) ?></span>
                                             </div>
                                         </div>
                                     </div>
                                     <h1 class="modal_payable">
                                         <span><?php echo lang('total_payable'); ?>: </span>
-                                        <span id="total_payable_hold"><?php echo getAmtP(0)?></span>
+                                        <span id="total_payable_hold"><?php echo getAmtP(0) ?></span>
                                     </h1>
                                 </div>
                             </div>
@@ -2283,19 +2280,19 @@ foreach ($notifications as $single_notification){
                                             </div>
                                             <div class="item">
                                                 <span><?php echo lang('sub_total'); ?>: </span>
-                                                <span id="sub_total_show_last_10"><?php echo getAmtP(0)?></span>
+                                                <span id="sub_total_show_last_10"><?php echo getAmtP(0) ?></span>
                                                 <span id="sub_total_last_10"
-                                                    class="ir_display_none"><?php echo getAmtP(0)?></span>
+                                                    class="ir_display_none"><?php echo getAmtP(0) ?></span>
                                                 <span id="total_item_discount_last_10"
-                                                    class="ir_display_none"><?php echo getAmtP(0)?></span>
+                                                    class="ir_display_none"><?php echo getAmtP(0) ?></span>
                                                 <span id="discounted_sub_total_amount_last_10"
-                                                    class="ir_display_none"><?php echo getAmtP(0)?></span>
+                                                    class="ir_display_none"><?php echo getAmtP(0) ?></span>
                                             </div>
                                             <div class="item">
                                                 <span><?php echo lang('discount'); ?> :</span>
-                                                <span id="sub_total_discount_last_10"><?php echo getAmtP(0)?></span>
+                                                <span id="sub_total_discount_last_10"><?php echo getAmtP(0) ?></span>
                                                 <span id="sub_total_discount_amount_last_10"
-                                                    class="ir_display_none"><?php echo getAmtP(0)?></span>
+                                                    class="ir_display_none"><?php echo getAmtP(0) ?></span>
                                             </div>
                                         </div>
 
@@ -2305,26 +2302,26 @@ foreach ($notifications as $single_notification){
                                         <div class="single_row forth">
                                             <div class="item">
                                                 <?php echo lang('total_discount'); ?> : <span
-                                                    id="all_items_discount_last_10"><?php echo getAmtP(0)?></span>
+                                                    id="all_items_discount_last_10"><?php echo getAmtP(0) ?></span>
                                             </div>
                                             <div class="item">
                                                 <?php echo lang('vat'); ?>:
-                                                <span id="recent_sale_modal_details_vat"><?php echo getAmtP(0)?></span>
+                                                <span id="recent_sale_modal_details_vat"><?php echo getAmtP(0) ?></span>
                                             </div>
                                             <div class="item">
                                                 <?php echo lang('delivery_charge'); ?>:
-                                                <span id="delivery_charge_last_10"><?php echo getAmtP(0)?></span>
+                                                <span id="delivery_charge_last_10"><?php echo getAmtP(0) ?></span>
                                             </div>
                                             <div class="item">
                                                 <?php echo lang('tips'); ?>:
-                                                <span id="tips_amount_last_10"><?php echo getAmtP(0)?></span>
+                                                <span id="tips_amount_last_10"><?php echo getAmtP(0) ?></span>
                                             </div>
                                         </div>
 
                                     </div>
                                     <h1 class="modal_payable">
                                         <?php echo lang('total_payable'); ?>: <span
-                                            id="total_payable_last_10"><?php echo getAmtP(0)?></span>
+                                            id="total_payable_last_10"><?php echo getAmtP(0) ?></span>
                                     </h1>
                                 </div>
 
@@ -2391,7 +2388,7 @@ foreach ($notifications as $single_notification){
 
             <div class="main-content show_bill_modal_content">
                 <header>
-                    <img src="<?=base_url()?>images/logo.png" />
+                    <img src="<?= base_url() ?>images/logo.png" />
                     <h3 class="title"></h3>
                     <p> <?php echo lang('Bill_No'); ?>: <span id="b_bill_no"></span></p>
                 </header>
@@ -2435,17 +2432,17 @@ foreach ($notifications as $single_notification){
             <div class="select_table_modal_info_holder2 scrollbar-macosx">
                 <ul class="custom_ul">
                     <?php
-                    if(isset($deliveryPartners) && $deliveryPartners):
-                        foreach ($deliveryPartners as $key=>$value):
+                    if (isset($deliveryPartners) && $deliveryPartners):
+                        foreach ($deliveryPartners as $key => $value):
                             $default_order_type_delivery_p = $this->session->userdata('default_order_type_delivery_p');
                             $checked = '';
-                            if($default_order_type_delivery_p==$value->id){
-                                $checked = "checked";
+                            if ($default_order_type_delivery_p == $value->id) {
+                                $checked = 'checked';
                             }
                             ?>
                             <li class="custom_li" data-aggregator_tran_code="<?php echo escape_output($value->aggregator_tran_code) ?>" data-row="<?php echo escape_output($value->id) ?>">
-                                <input type="checkbox" <?php echo escape_output($checked)?> name="delivery_partner_id" value="<?php echo escape_output($value->id) ?>" class="class_check"  id="myCheckbox<?php echo escape_output($value->id) ?>" />
-                                <label class="label_c" for="myCheckbox<?php echo escape_output($value->id) ?>"><img src="<?php echo base_url()?>images/<?php echo escape_output($value->logo) ?>"" />
+                                <input type="checkbox" <?php echo escape_output($checked) ?> name="delivery_partner_id" value="<?php echo escape_output($value->id) ?>" class="class_check"  id="myCheckbox<?php echo escape_output($value->id) ?>" />
+                                <label class="label_c" for="myCheckbox<?php echo escape_output($value->id) ?>"><img src="<?php echo base_url() ?>images/<?php echo escape_output($value->logo) ?>"" />
                                     <p class="dl_p_title"><?php echo escape_output($value->name) ?></p>
                                 </label>
                             </li>
@@ -2480,21 +2477,21 @@ foreach ($notifications as $single_notification){
             <div class="select_table_modal_info_holder2 scrollbar-macosx">
                 <ul class="custom_ul_order_type">
                     <?php
-                    //for default order type select
+                    // for default order type select
                     ?>
 
-                    <li class="custom_li_order_type <?php echo escape_output(isset($is_online_order) && $is_online_order=="Yes"?'self_order_skip':'')?>" data-row="dine_in_button">
-                        <label class="label_c" for="dine_in_modal"><img src="<?php echo base_url()?>assets/media/dine_in.png" />
+                    <li class="custom_li_order_type <?php echo escape_output(isset($is_online_order) && $is_online_order == 'Yes' ? 'self_order_skip' : '') ?>" data-row="dine_in_button">
+                        <label class="label_c" for="dine_in_modal"><img src="<?php echo base_url() ?>assets/media/dine_in.png" />
                             <p class="dl_p_title"><?php echo lang('dine'); ?></p>
                         </label>
                     </li>
                     <li class="custom_li_order_type" data-row="take_away_button">
-                        <label class="label_c" for="dine_in_modal"><img src="<?php echo base_url()?>assets/media/take_away.png" />
+                        <label class="label_c" for="dine_in_modal"><img src="<?php echo base_url() ?>assets/media/take_away.png" />
                             <p class="dl_p_title"><?php echo lang('take_away'); ?></p>
                         </label>
                     </li>
                     <li class="custom_li_order_type" data-row="delivery_button">
-                        <label class="label_c" for="dine_in_modal"><img src="<?php echo base_url()?>assets/media/delivery.png" />
+                        <label class="label_c" for="dine_in_modal"><img src="<?php echo base_url() ?>assets/media/delivery.png" />
                             <p class="dl_p_title"><?php echo lang('delivery'); ?></p>
                         </label>
                     </li>
@@ -2700,29 +2697,29 @@ foreach ($notifications as $single_notification){
                                 <span class="total__item"><?php echo lang('total_item'); ?>: <span
                                         class="total_items_in_cart_last_10_">0</span></span>
                                 <p class="txt self_hide_div"> <?php echo lang('total_discount'); ?>: <span
-                                        class="all_items_discount_last_10_"><?php echo getAmtP(0)?></span></p>
+                                        class="all_items_discount_last_10_"><?php echo getAmtP(0) ?></span></p>
                             </div>
                             <div class="txt__subtotal">
                                 <span><?php echo lang('sub_total'); ?>: <span
-                                        class="sub_total_show_last_10_"><?php echo getAmtP(0)?></span></span>
+                                        class="sub_total_show_last_10_"><?php echo getAmtP(0) ?></span></span>
 
                                 <p class="txt"><?php echo lang('vat'); ?>: <span
-                                        class="recent_sale_modal_details_vat_"><?php echo getAmtP(0)?></span></p>
+                                        class="recent_sale_modal_details_vat_"><?php echo getAmtP(0) ?></span></p>
                             </div>
                             <div class="txt__subtotal">
                                 <span class="discount"><?php echo lang('discount'); ?>: <span
-                                        class="sub_total_discount_last_10_"><?php echo getAmtP(0)?></span></span>
+                                        class="sub_total_discount_last_10_"><?php echo getAmtP(0) ?></span></span>
                                 <p class="txt self_hide_div"><?php echo lang('charge'); ?>: <span
-                                        class="delivery_charge_last_10_"><?php echo getAmtP(0)?></span></p>
+                                        class="delivery_charge_last_10_"><?php echo getAmtP(0) ?></span></p>
                             </div>
                             <div class="txt__subtotal">
                                 <p class="txt self_hide_div"><?php echo lang('tips'); ?>: <span
-                                        class="tips_amount_last_10_"><?php echo getAmtP(0)?></span></p>
+                                        class="tips_amount_last_10_"><?php echo getAmtP(0) ?></span></p>
                             </div>
                         </div>
                         <h3 class="payable">
-                            <span class=""><?php echo lang('total_payable');?>:</span>
-                            <span class="total_payable_last_10_"><?php echo getAmtP(0)?></span></h3>
+                            <span class=""><?php echo lang('total_payable'); ?>:</span>
+                            <span class="total_payable_last_10_"><?php echo getAmtP(0) ?></span></h3>
                     </div>
                 </div>
             </div>
@@ -2859,29 +2856,29 @@ foreach ($notifications as $single_notification){
                                 <span class="total__item"><?php echo lang('total_item'); ?>: <span
                                             class="total_items_in_cart_last_10_">0</span></span>
                             <p class="txt self_hide_div"> <?php echo lang('total_discount'); ?>: <span
-                                        class="all_items_discount_last_10_"><?php echo getAmtP(0)?></span></p>
+                                        class="all_items_discount_last_10_"><?php echo getAmtP(0) ?></span></p>
                         </div>
                         <div class="txt__subtotal">
                                 <span><?php echo lang('sub_total'); ?>: <span
-                                            class="sub_total_show_last_10_"><?php echo getAmtP(0)?></span></span>
+                                            class="sub_total_show_last_10_"><?php echo getAmtP(0) ?></span></span>
 
                             <p class="txt"><?php echo lang('vat'); ?>: <span
-                                        class="recent_sale_modal_details_vat_"><?php echo getAmtP(0)?></span></p>
+                                        class="recent_sale_modal_details_vat_"><?php echo getAmtP(0) ?></span></p>
                         </div>
                         <div class="txt__subtotal">
                                 <span class="discount"><?php echo lang('discount'); ?>: <span
-                                            class="sub_total_discount_last_10_"><?php echo getAmtP(0)?></span></span>
+                                            class="sub_total_discount_last_10_"><?php echo getAmtP(0) ?></span></span>
                             <p class="txt self_hide_div"><?php echo lang('charge'); ?>: <span
-                                        class="delivery_charge_last_10_"><?php echo getAmtP(0)?></span></p>
+                                        class="delivery_charge_last_10_"><?php echo getAmtP(0) ?></span></p>
                         </div>
                         <div class="txt__subtotal">
                             <p class="txt self_hide_div"><?php echo lang('tips'); ?>: <span
-                                        class="tips_amount_last_10_"><?php echo getAmtP(0)?></span></p>
+                                        class="tips_amount_last_10_"><?php echo getAmtP(0) ?></span></p>
                         </div>
                     </div>
                     <h3 class="payable">
-                        <span class=""><?php echo lang('total_payable');?>:</span>
-                        <span class="total_payable_last_10_"><?php echo getAmtP(0)?></span></h3>
+                        <span class=""><?php echo lang('total_payable'); ?>:</span>
+                        <span class="total_payable_last_10_"><?php echo getAmtP(0) ?></span></h3>
                 </div>
             </div>
         </div>
@@ -2953,42 +2950,42 @@ foreach ($notifications as $single_notification){
                                     <div><?php echo lang('total_item'); ?>: <span
                                             id="total_items_in_cart_order_details">0</span></div>
                                     <div><?php echo lang('sub_total'); ?>:
-                                        <span id="sub_total_show_order_details"><?php echo getAmtP(0)?></span>
+                                        <span id="sub_total_show_order_details"><?php echo getAmtP(0) ?></span>
                                         <span id="sub_total_order_details"
-                                            class="ir_display_none"><?php echo getAmtP(0)?></span>
+                                            class="ir_display_none"><?php echo getAmtP(0) ?></span>
                                         <span id="total_item_discount_order_details"
-                                            class="ir_display_none"><?php echo getAmtP(0)?></span>
+                                            class="ir_display_none"><?php echo getAmtP(0) ?></span>
                                         <span id="discounted_sub_total_amount_order_details"
-                                            class="ir_display_none"><?php echo getAmtP(0)?></span>
+                                            class="ir_display_none"><?php echo getAmtP(0) ?></span>
                                     </div>
                                     <div>
                                         <?php echo lang('discount'); ?>:
                                         <span id="sub_total_discount_order_details"></span><span
                                             id="sub_total_discount_amount_order_details"
-                                            class="ir_display_none"><?php echo getAmtP(0)?></span>
+                                            class="ir_display_none"><?php echo getAmtP(0) ?></span>
                                     </div>
                                 </div>
                                 <div class="item">
                                     <div>
                                         <?php echo lang('total_discount'); ?>:
-                                        <span id="all_items_discount_order_details"><?php echo getAmtP(0)?></span>
+                                        <span id="all_items_discount_order_details"><?php echo getAmtP(0) ?></span>
                                     </div>
                                     <div>
                                         <?php echo lang('vat'); ?>:
-                                        <span id="all_items_vat_order_details"><?php echo getAmtP(0)?></span>
+                                        <span id="all_items_vat_order_details"><?php echo getAmtP(0) ?></span>
                                     </div>
                                     <div>
                                         <?php echo lang('delivery_charge'); ?>:
-                                        <span id="delivery_charge_order_details"><?php echo getAmtP(0)?></span>
+                                        <span id="delivery_charge_order_details"><?php echo getAmtP(0) ?></span>
                                     </div>
                                     <div>
                                         <?php echo lang('tips'); ?>:
-                                        <span id="tips_amount_order_details"><?php echo getAmtP(0)?></span>
+                                        <span id="tips_amount_order_details"><?php echo getAmtP(0) ?></span>
                                     </div>
                                 </div>
                             </div>
                             <h1 class="modal_payable"><?php echo lang('total_payable'); ?> <span
-                                    id="total_payable_order_details"><?php echo getAmtP(0)?></span></h1>
+                                    id="total_payable_order_details"><?php echo getAmtP(0) ?></span></h1>
                         </div>
                     </div>
                 </div>
@@ -3038,10 +3035,10 @@ foreach ($notifications as $single_notification){
                         <span class="ir_display_none" id="finalize_update_type"></span>
                         <div class="half fix floatleft"><?php echo lang('total_payable'); ?></div>
                         <div class="half fix floatleft textright"><span
-                                    id="finalize_total_payable_old"><?php echo getAmtP(0)?></span></div>
+                                    id="finalize_total_payable_old"><?php echo getAmtP(0) ?></span></div>
                     </div>
                     <div class="fo_2 fix">
-                        <div class="half fix floatleft"><?php echo 'Payment Method';//lang('total_payment'); ?></div>
+                        <div class="half fix floatleft"><?php echo 'Payment Method'; // lang('total_payment'); ?></div>
                         <div class="half fix floatleft textright">
                             <select name="finalie_order_payment_method" class="select2" id="finalie_order_payment_method">
                                 <option value=""><?php echo lang('payment_method'); ?></option>
@@ -3079,12 +3076,12 @@ foreach ($notifications as $single_notification){
                             $i = 1;
                             $first_segment = 0;
                             $second_segment = 0;
-                            if(isset($denominations) && $denominations):
-                                $first_segment = (sizeof($denominations)/2);
+                            if (isset($denominations) && $denominations):
+                                $first_segment = (sizeof($denominations) / 2);
                                 foreach ($denominations as $value):
-                                    if($i<=$first_segment):
+                                    if ($i <= $first_segment):
                                         ?>
-                                        <li><a data-amount="<?=escape_output($value->amount)?>" class="get_quick_cash" href="#"><?php echo escape_output($value->amount)?></a></li>
+                                        <li><a data-amount="<?= escape_output($value->amount) ?>" class="get_quick_cash" href="#"><?php echo escape_output($value->amount) ?></a></li>
                                         <?php
                                         $i++;
                                     endif;
@@ -3096,12 +3093,12 @@ foreach ($notifications as $single_notification){
                     <div class="right-content floatleft">
                         <ul>
                             <?php
-                            if(isset($denominations) && $denominations):
+                            if (isset($denominations) && $denominations):
                                 $j = 1;
                                 foreach ($denominations as $value):
-                                    if($i<=$j):
+                                    if ($i <= $j):
                                         ?>
-                                        <li><a data-amount="<?=escape_output($value->amount)?>" class="get_quick_cash" href="#"><?php echo escape_output($value->amount)?></a></li>
+                                        <li><a data-amount="<?= escape_output($value->amount) ?>" class="get_quick_cash" href="#"><?php echo escape_output($value->amount) ?></a></li>
                                         <?php
                                     endif;
                                     $j++;
@@ -3178,37 +3175,38 @@ foreach ($notifications as $single_notification){
                 </div>
                 <div class="item">
                                     <span><?php echo lang('sub_total'); ?>:</span>
-                                    <span id="cart_modal_total_subtotal_text"><?php echo getAmtP(0)?></span>
+                                    <span id="cart_modal_total_subtotal_text"><?php echo getAmtP(0) ?></span>
                 </div>
                 <div class="item">
                                     <span>
                                         <?php echo lang('discount'); ?>: <span
-                                            id="cart_modal_total_discount_text"><?php echo getAmtP(0)?></span>
+                                            id="cart_modal_total_discount_text"><?php echo getAmtP(0) ?></span>
                                     </span>
                 </div>
                 <div class="item">
                                     <span><?php echo lang('total'); ?> <?php echo lang('discount'); ?>:</span>
-                                    <span id="cart_modal_total_discount_all_text"><?php echo getAmtP(0)?></span>
+                                    <span id="cart_modal_total_discount_all_text"><?php echo getAmtP(0) ?></span>
                 </div>
                 <div class="item">
                     <span><?php echo lang('vat'); ?>:</span>
-                    <span id="cart_modal_total_tax_text"><?php echo getAmtP(0)?></span>
+                    <span id="cart_modal_total_tax_text"><?php echo getAmtP(0) ?></span>
                 </div>
                 <div class="item">
                                     <span><?php echo lang('delivery_charge'); ?>: <span
-                                            id="cart_modal_total_charge_text"><?php echo getAmtP(0)?></span></span>
+                                            id="cart_modal_total_charge_text"><?php echo getAmtP(0) ?></span></span>
 
                 </div>
 
                 <div class="item">
                     <span><?php echo lang('tips'); ?>:
-                    <span id="cart_modal_total_tips_text"><?php echo getAmtP(0)?></span></span>
+                    <span id="cart_modal_total_tips_text"><?php echo getAmtP(0) ?></span></span>
                 </div>
                 <?php
-                $is_rounding_enable = $this->session->userdata('is_rounding_enable');?>
-                <div class="item <?php echo escape_output($is_rounding_enable) && $is_rounding_enable==1?'':'ir_display_none'?>">
+                $is_rounding_enable = $this->session->userdata('is_rounding_enable');
+                ?>
+                <div class="item <?php echo escape_output($is_rounding_enable) && $is_rounding_enable == 1 ? '' : 'ir_display_none' ?>">
                     <span><?php echo lang('Rounding'); ?>:
-                    <span id="cart_modal_total_rounding_texts"><?php echo getAmtP(0)?></span></span>
+                    <span id="cart_modal_total_rounding_texts"><?php echo getAmtP(0) ?></span></span>
                 </div>
             </div>
             <div class="btn__box">
@@ -3242,32 +3240,34 @@ foreach ($notifications as $single_notification){
                         <li class="head">
                             <b><?php echo lang('payment_method'); ?></b>
                         </li>
-                        <?php foreach ($payment_method_finalize as $value):
-                            $selected = "";
-                            $is_cash = "";
+                        <?php
+                        foreach ($payment_method_finalize as $value):
+                            $selected = '';
+                            $is_cash = '';
                             $default_payment = $getCompanyInfo->default_payment;
                             $is_loyalty_enable = $getCompanyInfo->is_loyalty_enable;
-                            if($value->id==$default_payment){
-                                $selected = "active";
+                            if ($value->id == $default_payment) {
+                                $selected = 'active';
                             }
-                            if($value->id!=1){
-                                $is_cash = "set_no_access";
+                            if ($value->id != 1) {
+                                $is_cash = 'set_no_access';
                             }
-                            if($is_loyalty_enable!='enable'):
-                                if($value->id!=5):
-                            ?>
+                            if ($is_loyalty_enable != 'enable'):
+                                if ($value->id != 5):
+                                    ?>
                                 <li>
-                                    <a class="<?php echo escape_output($is_cash)?> <?php echo escape_output($selected)?> set_payment" data-id="<?php echo escape_output($value->id)?>" href="#"><?php echo escape_output($value->name)?></a>
+                                    <a class="<?php echo escape_output($is_cash) ?> <?php echo escape_output($selected) ?> set_payment" data-id="<?php echo escape_output($value->id) ?>" href="#"><?php echo escape_output($value->name) ?></a>
                                 </li>
                                 <?php
-                                    endif;
-                                else:?>
+                                endif;
+                            else:
+                                ?>
                                 <li>
-                                    <a class="<?php echo escape_output($is_cash)?> <?php echo escape_output($selected)?> set_payment" data-id="<?php echo escape_output($value->id)?>" href="#"><?php echo escape_output($value->name)?></a>
+                                    <a class="<?php echo escape_output($is_cash) ?> <?php echo escape_output($selected) ?> set_payment" data-id="<?php echo escape_output($value->id) ?>" href="#"><?php echo escape_output($value->name) ?></a>
                                 </li>
-                            <?php endif;?>
+                            <?php endif; ?>
 
-                        <?php endforeach;?>
+                        <?php endforeach; ?>
                         <li class=""> <a  id="change_currency_btn" class="change_currency_btn" href="#"><?php echo lang('change_currency'); ?></a> </li>
                     </ul>
                 </div>
@@ -3279,7 +3279,7 @@ foreach ($notifications as $single_notification){
                         <div id="tab-1">
                             <header>
                                 <h3 class="name-of-payment set_no_access" id="payment_preview"><?php echo lang('Cash_Payment'); ?></h3>
-                                <p><img id="cash_img" src="<?php echo base_url()?>assets/media/dollar_sign.png"> <span class="previous_due_div"><?php echo lang('Previous_Due'); ?>:</span>  <span class="previous_due_div"><?php echo escape_output($this->session->userdata('currency')); ?></span><span class="previous_due_div" id="finalize_previous_due">0.00</span><span class="loyalty_point_div"><?php echo lang('available_loyalty_point'); ?></span> <span class="loyalty_point_div" id="available_loyalty_point">0</span> <span class="change_amount_div display_none change_amount_p"> &nbsp;<?php echo lang('change_amount'); ?>:</span> <span class="change_amount_div display_none change_amount_p" id="change_amount_div_">0</span></p>
+                                <p><img id="cash_img" src="<?php echo base_url() ?>assets/media/dollar_sign.png"> <span class="previous_due_div"><?php echo lang('Previous_Due'); ?>:</span>  <span class="previous_due_div"><?php echo escape_output($this->session->userdata('currency')); ?></span><span class="previous_due_div" id="finalize_previous_due">0.00</span><span class="loyalty_point_div"><?php echo lang('available_loyalty_point'); ?></span> <span class="loyalty_point_div" id="available_loyalty_point">0</span> <span class="change_amount_div display_none change_amount_p"> &nbsp;<?php echo lang('change_amount'); ?>:</span> <span class="change_amount_div display_none change_amount_p" id="change_amount_div_">0</span></p>
 
                             </header>
                             <div class="payment-amount">
@@ -3310,12 +3310,12 @@ foreach ($notifications as $single_notification){
                                     <table class="finalize_modal_is_mul_currency">
                                         <tr>
                                             <td class="width_50_p">
-                                                <select class="form-control select2 multi_currency irp_width_100" style="<?php echo escape_output(getWidth100())?>" id="multi_currency">
+                                                <select class="form-control select2 multi_currency irp_width_100" style="<?php echo escape_output(getWidth100()) ?>" id="multi_currency">
                                                     <option data-multi_currency="0" value=""><?php echo lang('change_currency') ?></option>
                                                     <!--This variable could not be escaped because this is html-->
                                                     <?php foreach ($MultipleCurrencies as $value): ?>
-                                                        <option data-multi_currency="<?php echo escape_output($value->conversion_rate)?>" value="<?php echo escape_output($value->currency)?>"><?php echo escape_output($value->currency)?></option>
-                                                    <?php endforeach;?>
+                                                        <option data-multi_currency="<?php echo escape_output($value->conversion_rate) ?>" value="<?php echo escape_output($value->currency) ?>"><?php echo escape_output($value->currency) ?></option>
+                                                    <?php endforeach; ?>
                                                 </select></td>
                                             <td class="width_50_p">
                                                 <input type="text" placeholder="<?php echo lang('amount') ?>" onfocus="select();"  readonly id="multi_currency_amount" class="custom_field">
@@ -3334,46 +3334,46 @@ foreach ($notifications as $single_notification){
 
                                             </ul>
 
-                                            <input type="text" placeholder="<?php echo lang('token_number') ?>" onfocus="select();"  id="token_number" class="custom_field custom_field_token">
+                                            <input type="text" placeholder="<?php echo lang('token_number') ?>" onfocus="select();" value="" id="token_number" class="custom_field custom_field_token">
 
                                         </div>
 
                                         <div class="right-content">
                                             <div class="item">
                                                 <h3 class="title"><?php echo lang('Payable') ?></h3>
-                                                <p><?php echo escape_output($this->session->userdata('currency')); ?><span id="finalize_total_payable"><?php echo getAmt(0)?></span></p>
+                                                <p><?php echo escape_output($this->session->userdata('currency')); ?><span id="finalize_total_payable"><?php echo getAmt(0) ?></span></p>
                                             </div>
 
                                             <div class="item">
                                                 <h3 class="title"><?php echo lang('paid') ?></h3>
-                                                <p><?php echo escape_output($this->session->userdata('currency')); ?><span class="spincrement" id="finalize_total_paid"><?php echo getAmt(0)?></span></p>
+                                                <p><?php echo escape_output($this->session->userdata('currency')); ?><span class="spincrement" id="finalize_total_paid"><?php echo getAmt(0) ?></span></p>
                                             </div>
 
                                             <!-- <div class="item">
                                                 <h3 class="title"><?php echo lang('due') ?></h3>
-                                                <p><?php echo escape_output($this->session->userdata('currency')); ?><span class="spincrement" id="finalize_total_due"><?php echo getAmt(0)?></span></p> 
+                                                <p><?php echo escape_output($this->session->userdata('currency')); ?><span class="spincrement" id="finalize_total_due"><?php echo getAmt(0) ?></span></p> 
                                             </div> -->
  											<div class="item">
                                                 <h3 class="title"><?php echo lang('Discount') ?> Discount</h3>
-                                                <p><?php echo escape_output($this->session->userdata('currency')); ?><span id="finalize_total_discount"><?php echo getAmt(0)?></p>
+                                                <p><?php echo escape_output($this->session->userdata('currency')); ?><span id="finalize_total_discount"><?php echo getAmt(0) ?></p>
                                             </div>
                                               <?php
-                                              $sms_send_auto = $this->session->userdata('sms_send_auto');
-                                              $company_id = $this->session->userdata('company_id');
-                                              $company = companyInformation($company_id);
-                                              if(isset($company->sms_service_provider) && $company->sms_service_provider):
-                                              ?>
+$sms_send_auto = $this->session->userdata('sms_send_auto');
+$company_id = $this->session->userdata('company_id');
+$company = companyInformation($company_id);
+if (isset($company->sms_service_provider) && $company->sms_service_provider):
+    ?>
                                                 <table class="irp_width_100">
                                                     <tr>
-                                                        <td><button><label for="check_send_sms" class="check_send_sms"><input id="check_send_sms" <?php echo isset($sms_send_auto) && $sms_send_auto==2?'checked':''?>  type="checkbox"><?php echo lang('send_sms') ?></label></button></td>
+                                                        <td><button><label for="check_send_sms" class="check_send_sms"><input id="check_send_sms" <?php echo isset($sms_send_auto) && $sms_send_auto == 2 ? 'checked' : '' ?>  type="checkbox"><?php echo lang('send_sms') ?></label></button></td>
                                                         <td><button id="open_finalize_cart_details"><?php echo lang('Cart_Details') ?></button></td>
                                                     </tr>
                                                 </table>
                                             <?php
-                                                else:
-                                            ?>
+else:
+    ?>
                                                     <button id="open_finalize_cart_details"><?php echo lang('Cart_Details') ?></button>
-                                            <?php endif?>
+                                            <?php endif ?>
 
                                         </div>
                                     </div>
@@ -3382,14 +3382,14 @@ foreach ($notifications as $single_notification){
 
                                     <ul class="key-list">
                                         <li><a id="open_finalize_discount" href="#"><?php echo lang('discount') ?></a></li> 
-                                         <li><a data-amount="" data-is_denomination="" id="quick-cash-default-amount" class="set_no_access get_quick_cash set_default_quick_cach" href="#"><?php echo getAmtPCustom(0)?></a></li> 
+                                         <li><a data-amount="" data-is_denomination="" id="quick-cash-default-amount" class="set_no_access get_quick_cash set_default_quick_cach" href="#"><?php echo getAmtPCustom(0) ?></a></li> 
                                         <li class="third">
                                             <ul>
                                                 <?php
-                                                if(isset($denominations) && $denominations):
+                                                if (isset($denominations) && $denominations):
                                                     foreach ($denominations as $value):
-                                                            ?>
-                                                            <li><a  data-is_denomination="yes"  data-amount="<?=escape_output($value->amount)?>" class="set_no_access get_quick_cash" href="#"><?php echo escape_output($value->amount)?></a></li>
+                                                        ?>
+                                                            <li><a  data-is_denomination="yes"  data-amount="<?= escape_output($value->amount) ?>" class="set_no_access get_quick_cash" href="#"><?php echo escape_output($value->amount) ?></a></li>
                                                             <?php
                                                     endforeach;
                                                 endif;
@@ -3444,13 +3444,13 @@ foreach ($notifications as $single_notification){
 
             <div id="notification_list_holder">
                 <!--This variable could not be escaped because this is html content-->
-                <?php echo ($notification_list_show);?>
+                <?php echo ($notification_list_show); ?>
             </div>
             <!-- <span class="btn-close">&times;</span> -->
             <!-- <p>Some text in the Modal..</p> -->
             <div id="notification_close_delete_button_holder">
                 <button id="notification_remove_all"><?php echo lang('remove'); ?></button>
-                <button id="notification_close"><?php echo 'Cancel';//lang('close'); ?></button>
+                <button id="notification_close"><?php echo 'Cancel'; // lang('close'); ?></button>
             </div>
         </div>
 
@@ -3499,12 +3499,12 @@ foreach ($notifications as $single_notification){
                     <div id="kot_list_holder">
                         <ul class="custom_ul">
                             <?php
-                            if(isset($kitchens) && $kitchens):
-                                foreach ($kitchens as $key=>$value):
+                            if (isset($kitchens) && $kitchens):
+                                foreach ($kitchens as $key => $value):
                                     ?>
                                     <li class="custom_li_kitchen" data-row="<?php echo escape_output($value->id) ?>">
                                         <input type="checkbox" name="kitchen_id[]" value="<?php echo escape_output($value->id) ?>" id="myCheckboxKitchen<?php echo escape_output($value->id) ?>" class="kitchen_ids class_check" />
-                                        <label class="label_c_kitchen kitchen_img_parent" for="myCheckboxKitchen<?php echo escape_output($value->id) ?>"><img class="kitchen_img" src="<?php echo base_url()?>assets/media/kitchen.png" />
+                                        <label class="label_c_kitchen kitchen_img_parent" for="myCheckboxKitchen<?php echo escape_output($value->id) ?>"><img class="kitchen_img" src="<?php echo base_url() ?>assets/media/kitchen.png" />
                                             <p class="dl_p_title"><?php echo escape_output($value->name) ?></p>
                                         </label>
                                     </li>
@@ -3531,7 +3531,7 @@ foreach ($notifications as $single_notification){
         <!-- Modal Content -->
         <div class="modal-content" id="modal_bot_list_details">
             <h1 id="modal_bot_header">
-                <?php echo "BOT"; ?>
+                <?php echo 'BOT'; ?>
                 <a href="javascript:void(0)" class="ir_top5_right_10 alertCloseIcon" id="cancel_bot_modal2"><i
                         class="fal fa-times"></i></a>
             </h1>
@@ -3755,8 +3755,8 @@ foreach ($notifications as $single_notification){
             <img src="<?php echo escape_output($system_logo); ?>">
         </div>
         <ul class="pos__menu__list scrollbar-macosx">
-            <li><a href="<?php echo base_url()?>Authentication/userProfile"><i data-feather="users"></i><span> &nbsp; <?php echo lang('home'); ?></span></a></li>
-            <?php if(isServiceAccess('','','sGmsJaFJE')): ?>
+            <li><a href="<?php echo base_url() ?>Authentication/userProfile"><i data-feather="users"></i><span> &nbsp; <?php echo lang('home'); ?></span></a></li>
+            <?php if (isServiceAccess('', '', 'sGmsJaFJE')): ?>
             <li class="have_sub_menu">
                 <a class="open-trigger" href="javascript:void(0)">
                     <svg  width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-file-text"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
@@ -3766,30 +3766,30 @@ foreach ($notifications as $single_notification){
                     </span>
                 </a>
                 <ul class="sub__menu__list">
-                    <li data-access="saas" class="menu_assign_class" data-menu__cid="irp_2"><a href="<?php echo base_url()?>Service/siteSetting">
+                    <li data-access="saas" class="menu_assign_class" data-menu__cid="irp_2"><a href="<?php echo base_url() ?>Service/siteSetting">
                             <i class="fa fa-angle-double-right"></i> <?php echo lang('site_setting'); ?></a></li>
-                    <li data-access="saas" class="menu_assign_class" data-menu__cid="irp_2"><a href="<?php echo base_url()?>Service/emailSetting">
+                    <li data-access="saas" class="menu_assign_class" data-menu__cid="irp_2"><a href="<?php echo base_url() ?>Service/emailSetting">
                             <i class="fa fa-angle-double-right"></i> <?php echo lang('email_setting'); ?></a></li>
-                    <li data-access="saas" class="menu_assign_class" data-menu__cid="irp_2"><a href="<?php echo base_url()?>Service/paymentSetting">
+                    <li data-access="saas" class="menu_assign_class" data-menu__cid="irp_2"><a href="<?php echo base_url() ?>Service/paymentSetting">
                             <i class="fa fa-angle-double-right"></i> <?php echo lang('Payment_Setting'); ?></a></li>
-                    <li data-access="saas" class="menu_assign_class" data-menu__cid="irp_2"><a href="<?php echo base_url()?>Service/addEditCompany">
+                    <li data-access="saas" class="menu_assign_class" data-menu__cid="irp_2"><a href="<?php echo base_url() ?>Service/addEditCompany">
                             <i class="fa fa-angle-double-right"></i> <?php echo lang('Add'); ?> <?php echo lang('Company'); ?></a></li>
-                    <li data-access="saas" class="menu_assign_class" data-menu__cid="irp_2"><a href="<?php echo base_url()?>Service/companies">
+                    <li data-access="saas" class="menu_assign_class" data-menu__cid="irp_2"><a href="<?php echo base_url() ?>Service/companies">
                             <i class="fa fa-angle-double-right"></i> <?php echo lang('List'); ?> <?php echo lang('Company'); ?></a></li>
 
-                    <li data-access="saas" class="menu_assign_class" data-menu__cid="irp_2"><a href="<?php echo base_url()?>Service/addManualPayment">
+                    <li data-access="saas" class="menu_assign_class" data-menu__cid="irp_2"><a href="<?php echo base_url() ?>Service/addManualPayment">
                             <i class="fa fa-angle-double-right"></i> <?php echo lang('Add'); ?> <?php echo lang('Manual_Payment'); ?></a></li>
-                    <li data-access="saas" class="menu_assign_class" data-menu__cid="irp_2"><a href="<?php echo base_url()?>Service/paymentHistory">
+                    <li data-access="saas" class="menu_assign_class" data-menu__cid="irp_2"><a href="<?php echo base_url() ?>Service/paymentHistory">
                             <i class="fa fa-angle-double-right"></i> <?php echo lang('List'); ?> <?php echo lang('Manual_Payment'); ?></a></li>
-                    <li data-access="saas" class="menu_assign_class" data-menu__cid="irp_2"><a href="<?php echo base_url()?>Service/addPricingPlan">
+                    <li data-access="saas" class="menu_assign_class" data-menu__cid="irp_2"><a href="<?php echo base_url() ?>Service/addPricingPlan">
                             <i class="fa fa-angle-double-right"></i> <?php echo lang('Add'); ?> <?php echo lang('Pricing_Plan'); ?></a></li>
-                    <li data-access="saas" class="menu_assign_class" data-menu__cid="irp_2"><a href="<?php echo base_url()?>Service/pricingPlans">
+                    <li data-access="saas" class="menu_assign_class" data-menu__cid="irp_2"><a href="<?php echo base_url() ?>Service/pricingPlans">
                             <i class="fa fa-angle-double-right"></i> <?php echo lang('List'); ?> <?php echo lang('Pricing_Plan'); ?></a></li>
-                    <li data-access="saas" class="menu_assign_class" data-menu__cid="irp_2"><a href="<?php echo base_url()?>Service/reservationSetting">
+                    <li data-access="saas" class="menu_assign_class" data-menu__cid="irp_2"><a href="<?php echo base_url() ?>Service/reservationSetting">
                             <?php echo lang('reservationSetting'); ?></a></li>
                 </ul>
             </li>
-            <?php endif?>
+            <?php endif ?>
             <li class="have_sub_menu check_main_menu">
                 <a class="open-trigger" href="javascript:void(0)">
                     <svg  width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-settings"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
@@ -3800,27 +3800,27 @@ foreach ($notifications as $single_notification){
                 </a>
                 <ul class="sub__menu__list">
                     <?php
-                        $main_com = getMainCompany();
-                        $languge_manifesto = $main_com->languge_manifesto;
-                        if($languge_manifesto=="sGmsJaFJVE" && $user_id!=1):
-                    ?>
+                    $main_com = getMainCompany();
+                    $languge_manifesto = $main_com->languge_manifesto;
+                    if ($languge_manifesto == 'sGmsJaFJVE' && $user_id != 1):
+                        ?>
 
-                    <li data-access="" class="" data-menu__cid="irp_2"><a href="<?php echo base_url()?>authentication/currentPlanDetails">
+                    <li data-access="" class="" data-menu__cid="irp_2"><a href="<?php echo base_url() ?>authentication/currentPlanDetails">
                     <i class="fa fa-angle-double-right"></i><?php echo lang('Current_Plan_Details'); ?> </a></li>
-                    <?php endif?>
+                    <?php endif ?>
 
                     <li  data-access="update-6" class="menu_assign_class">
-                        <a href="<?php echo base_url()?>setting/index">
+                        <a href="<?php echo base_url() ?>setting/index">
                             <i class="fa fa-angle-double-right"></i>
                             <?php echo lang('Settings'); ?>
                         </a>
                     </li>
                     <?php
-                    if(!isFoodCourt()):
+                    if (!isFoodCourt()):
                         $wlb = $this->session->userdata('wlb');
-                        if($wlb==1):
-                            if($getCompanyInfo->id==1):
-                            ?>
+                        if ($wlb == 1):
+                            if ($getCompanyInfo->id == 1):
+                                ?>
                     <li  data-access="update-49" class="menu_assign_class">
                         <a href="<?php echo base_url(); ?>WhiteLabel">
                             <i class="fa fa-angle-double-right"></i>
@@ -3828,58 +3828,58 @@ foreach ($notifications as $single_notification){
                         </a>
                     </li>
                     <?php
+                            endif;
                         endif;
                     endif;
-                    endif;
                     ?>
-                     <li  data-access="add-35" class="menu_assign_class"><a href="<?php echo base_url()?>printer/addEditPrinter">
+                     <li  data-access="add-35" class="menu_assign_class"><a href="<?php echo base_url() ?>printer/addEditPrinter">
                                     <i class="fa fa-angle-double-right"></i> <?php echo lang('Add'); ?> <?php echo lang('Printer'); ?></a></li>
-                            <li  data-access="update-35" class="menu_assign_class"><a href="<?php echo base_url()?>printer/printers">
+                            <li  data-access="update-35" class="menu_assign_class"><a href="<?php echo base_url() ?>printer/printers">
                                     <i class="fa fa-angle-double-right"></i> <?php echo lang('List'); ?> <?php echo lang('Printer'); ?></a></li>
-                                    <li data-access="add-353" class="menu_assign_class" data-menu__cid="irp_32"><a href="<?php echo base_url()?>counter/addEditCounter">
+                                    <li data-access="add-353" class="menu_assign_class" data-menu__cid="irp_32"><a href="<?php echo base_url() ?>counter/addEditCounter">
                                         <i class="fa fa-angle-double-right"></i> <?php echo lang('Add'); ?> <?php echo lang('counter'); ?></a></li>
-                                    <li data-access="view-353" class="menu_assign_class" data-menu__cid="irp_32"><a href="<?php echo base_url()?>counter/counters">
+                                    <li data-access="view-353" class="menu_assign_class" data-menu__cid="irp_32"><a href="<?php echo base_url() ?>counter/counters">
                                         <i class="fa fa-angle-double-right"></i> <?php echo lang('List'); ?> <?php echo lang('counter'); ?></a></li>
-                    <li  data-access="update_tax-52" class="menu_assign_class"><a href="<?php echo base_url()?>setting/tax">
+                    <li  data-access="update_tax-52" class="menu_assign_class"><a href="<?php echo base_url() ?>setting/tax">
                             <i class="fa fa-angle-double-right"></i> <?php echo lang('Tax_Setting'); ?></a></li>
-                    <li  data-access="add-55" class="menu_assign_class"><a href="<?php echo base_url()?>MultipleCurrency/addEditMultipleCurrency">
+                    <li  data-access="add-55" class="menu_assign_class"><a href="<?php echo base_url() ?>MultipleCurrency/addEditMultipleCurrency">
                             <i class="fa fa-angle-double-right"></i> <?php echo lang('Add'); ?> <?php echo lang('Multiple_Currency'); ?></a></li>
-                    <li  data-access="view-55" class="menu_assign_class"><a href="<?php echo base_url()?>MultipleCurrency/MultipleCurrencies">
+                    <li  data-access="view-55" class="menu_assign_class"><a href="<?php echo base_url() ?>MultipleCurrency/MultipleCurrencies">
                             <i class="fa fa-angle-double-right"></i> <?php echo lang('List'); ?> <?php echo lang('Multiple_Currency'); ?></a></li>
-                   <?php if($company_id==1): ?>
-                        <li  data-access="update-60" class="menu_assign_class"><a href="<?php echo base_url()?>Update/index">
+                   <?php if ($company_id == 1): ?>
+                        <li  data-access="update-60" class="menu_assign_class"><a href="<?php echo base_url() ?>Update/index">
                                 <i class="fa fa-angle-double-right"></i> <?php echo lang('software_update'); ?></a></li>
-                        <li  data-access="uninstall-62" class="menu_assign_class"><a href="<?php echo base_url()?>Update/UninstallLicense">
+                        <li  data-access="uninstall-62" class="menu_assign_class"><a href="<?php echo base_url() ?>Update/UninstallLicense">
                                 <i class="fa fa-angle-double-right"></i> <?php echo lang('Uninstall_License'); ?></a></li>
                     <?php endif; ?>
-                    <li  data-access="update-64" class="menu_assign_class"><a href="<?php echo base_url()?>setting/selfOrder">
+                    <li  data-access="update-64" class="menu_assign_class"><a href="<?php echo base_url() ?>setting/selfOrder">
                             <i class="fa fa-angle-double-right"></i> <?php echo lang('sos_Self_Order_Setting'); ?></a></li>
-                    <li data-access="update-334" class="menu_assign_class" data-menu__cid="irp_32"><a href="<?php echo base_url()?>setting/onlineOrder">
+                    <li data-access="update-334" class="menu_assign_class" data-menu__cid="irp_32"><a href="<?php echo base_url() ?>setting/onlineOrder">
                             <i class="fa fa-angle-double-right"></i> <?php echo lang('sos_online_order_setting'); ?></a></li>
-                    <li data-access="update-64" class="menu_assign_class" data-menu__cid="irp_2"><a href="<?php echo base_url()?>authentication/reservationSetting">
+                    <li data-access="update-64" class="menu_assign_class" data-menu__cid="irp_2"><a href="<?php echo base_url() ?>authentication/reservationSetting">
                             <i class="fa fa-angle-double-right"></i> <?php echo lang('reservationSetting'); ?></a></li>
 
-                    <li data-access="add-260" class="menu_assign_class" data-menu__cid="irp_16"><a href="<?php echo base_url()?>paymentMethod/addEditPaymentMethod">
+                    <li data-access="add-260" class="menu_assign_class" data-menu__cid="irp_16"><a href="<?php echo base_url() ?>paymentMethod/addEditPaymentMethod">
                             <i class="fa fa-angle-double-right"></i> <?php echo lang('Add'); ?> <?php echo lang('payment_method'); ?></a></li>
-                    <li data-access="view-260" class="menu_assign_class" data-menu__cid="irp_16"><a href="<?php echo base_url()?>paymentMethod/paymentMethods">
+                    <li data-access="view-260" class="menu_assign_class" data-menu__cid="irp_16"><a href="<?php echo base_url() ?>paymentMethod/paymentMethods">
                             <i class="fa fa-angle-double-right"></i> <?php echo lang('List'); ?> <?php echo lang('payment_method'); ?></a></li>
-                    <li data-access="add-265" class="menu_assign_class" data-menu__cid="irp_16"><a href="<?php echo base_url()?>Denomination/addEditDenomination">
+                    <li data-access="add-265" class="menu_assign_class" data-menu__cid="irp_16"><a href="<?php echo base_url() ?>Denomination/addEditDenomination">
                             <i class="fa fa-angle-double-right"></i> <?php echo lang('Add'); ?> <?php echo lang('denomination'); ?></a></li>
-                    <li data-access="view-265" class="menu_assign_class" data-menu__cid="irp_16"><a href="<?php echo base_url()?>Denomination/denominations">
+                    <li data-access="view-265" class="menu_assign_class" data-menu__cid="irp_16"><a href="<?php echo base_url() ?>Denomination/denominations">
                             <i class="fa fa-angle-double-right"></i> <?php echo lang('List'); ?> <?php echo lang('denomination'); ?></a></li>
-                    <li data-access="add-270" class="menu_assign_class" data-menu__cid="irp_16"><a href="<?php echo base_url()?>DeliveryPartner/addEditDeliveryPartner">
+                    <li data-access="add-270" class="menu_assign_class" data-menu__cid="irp_16"><a href="<?php echo base_url() ?>DeliveryPartner/addEditDeliveryPartner">
                             <i class="fa fa-angle-double-right"></i> <?php echo lang('Add'); ?> <?php echo lang('deliveryPartner'); ?></a></li>
-                    <li data-access="view-270" class="menu_assign_class" data-menu__cid="irp_16"><a href="<?php echo base_url()?>DeliveryPartner/deliveryPartners">
+                    <li data-access="view-270" class="menu_assign_class" data-menu__cid="irp_16"><a href="<?php echo base_url() ?>DeliveryPartner/deliveryPartners">
                             <i class="fa fa-angle-double-right"></i> <?php echo lang('List'); ?> <?php echo lang('deliveryPartner'); ?></a></li>
-                    <li data-access="add-275" class="menu_assign_class" data-menu__cid="irp_16"><a href="<?php echo base_url()?>Area/addEditArea">
+                    <li data-access="add-275" class="menu_assign_class" data-menu__cid="irp_16"><a href="<?php echo base_url() ?>Area/addEditArea">
                             <i class="fa fa-angle-double-right"></i> <?php echo lang('Add'); ?> <?php echo lang('area'); ?></a></li>
-                    <li data-access="view-275" class="menu_assign_class" data-menu__cid="irp_16"><a href="<?php echo base_url()?>Area/areas">
+                    <li data-access="view-275" class="menu_assign_class" data-menu__cid="irp_16"><a href="<?php echo base_url() ?>Area/areas">
                             <i class="fa fa-angle-double-right"></i> <?php echo lang('List'); ?> <?php echo lang('area'); ?></a></li>
-                    <li data-access="add-280" class="menu_assign_class" data-menu__cid="irp_16"><a href="<?php echo base_url()?>table/addEditTable">
+                    <li data-access="add-280" class="menu_assign_class" data-menu__cid="irp_16"><a href="<?php echo base_url() ?>table/addEditTable">
                             <i class="fa fa-angle-double-right"></i> <?php echo lang('Add'); ?> <?php echo lang('table'); ?></a></li>
-                    <li data-access="view-280" class="menu_assign_class" data-menu__cid="irp_16"><a href="<?php echo base_url()?>table/tables">
+                    <li data-access="view-280" class="menu_assign_class" data-menu__cid="irp_16"><a href="<?php echo base_url() ?>table/tables">
                             <i class="fa fa-angle-double-right"></i> <?php echo lang('List'); ?> <?php echo lang('table'); ?></a></li>
-                   <li data-access="view-280" class="menu_assign_class" data-menu__cid="irp_16"><a href="<?php echo base_url()?>table/tableLayoutSetting">
+                   <li data-access="view-280" class="menu_assign_class" data-menu__cid="irp_16"><a href="<?php echo base_url() ?>table/tableLayoutSetting">
                             <i class="fa fa-angle-double-right"></i> <?php echo lang('table_layout_setting'); ?></a></li>
                 </ul>
             </li>
@@ -3892,24 +3892,25 @@ foreach ($notifications as $single_notification){
                     </span>
                 </a>
                 <ul class="sub__menu__list">
-                    <li data-access="add-212" class="menu_assign_class" data-menu__cid="irp_16"><a href="<?php echo base_url()?>Unit/addEditUnit"><i class="fa fa-angle-double-right"></i> <?php echo lang('Add'); ?> <?php echo lang('Ingredient_Unit'); ?></a></li>
-                    <li data-access="view-212" class="menu_assign_class" data-menu__cid="irp_16"><a href="<?php echo base_url()?>Unit/Units"><i class="fa fa-angle-double-right"></i> <?php echo lang('List'); ?> <?php echo lang('Ingredient_Unit'); ?></a></li>
-                    <li data-access="add-207" class="menu_assign_class" data-menu__cid="irp_16"><a href="<?php echo base_url()?>ingredientCategory/addEditIngredientCategory"><i class="fa fa-angle-double-right"></i> <?php echo lang('Add'); ?> <?php echo lang('ingredient_category'); ?></a></li>
-                    <li data-access="view-207" class="menu_assign_class" data-menu__cid="irp_16"><a href="<?php echo base_url()?>ingredientCategory/ingredientCategories"><i class="fa fa-angle-double-right"></i> <?php echo lang('List'); ?> <?php echo lang('ingredient_category'); ?></a></li>
-                    <li data-access="add-217" class="menu_assign_class" data-menu__cid="irp_16"><a href="<?php echo base_url()?>ingredient/addEditIngredient"><i class="fa fa-angle-double-right"></i> <?php echo lang('Add'); ?> <?php echo lang('ingredient'); ?></a></li>
-                    <li data-access="view-217" class="menu_assign_class" data-menu__cid="irp_16"><a href="<?php echo base_url()?>ingredient/ingredients"><i class="fa fa-angle-double-right"></i> <?php echo lang('List'); ?> <?php echo lang('ingredient'); ?></a></li>
-                    <li data-access="add-223" class="menu_assign_class" data-menu__cid="irp_16"><a href="<?php echo base_url()?>modifier/addEditModifier"><i class="fa fa-angle-double-right"></i> <?php echo lang('Add'); ?> <?php echo lang('modifier'); ?></a></li>
-                    <li data-access="view-223" class="menu_assign_class" data-menu__cid="irp_16"><a href="<?php echo base_url()?>modifier/modifiers"><i class="fa fa-angle-double-right"></i> <?php echo lang('List'); ?> <?php echo lang('modifier'); ?></a></li>
-                    <li data-access="add-229" class="menu_assign_class" data-menu__cid="irp_16"><a href="<?php echo base_url()?>foodMenuCategory/addEditFoodMenuCategory"><i class="fa fa-angle-double-right"></i> <?php echo lang('Add'); ?> <?php echo lang('food_menu_category'); ?></a></li>
-                    <li data-access="view-229" class="menu_assign_class" data-menu__cid="irp_16"><a href="<?php echo base_url()?>foodMenuCategory/foodMenuCategories"><i class="fa fa-angle-double-right"></i> <?php echo lang('List'); ?> <?php echo lang('food_menu_category'); ?></a></li>
-                    <li data-access="add-234" class="menu_assign_class" data-menu__cid="irp_16"><a href="<?php echo base_url()?>foodMenu/addEditFoodMenu"><i class="fa fa-angle-double-right"></i> <?php echo lang('Add'); ?> <?php echo lang('food_menu'); ?></a></li>
-                    <li data-access="view-234" class="menu_assign_class" data-menu__cid="irp_16"><a href="<?php echo base_url()?>foodMenu/foodMenus"><i class="fa fa-angle-double-right"></i> <?php echo lang('List'); ?> <?php echo lang('food_menu'); ?></a></li>
-                    <li data-access="add-325" class="menu_assign_class" data-menu__cid="irp_16"><a href="<?php echo base_url()?>PreMadeFood/addEditPreMadeFood"><i class="fa fa-angle-double-right"></i> <?php echo lang('Add'); ?> <?php echo lang('premade_food'); ?></a></li>
-                    <li data-access="view-325" class="menu_assign_class" data-menu__cid="irp_16"><a href="<?php echo base_url()?>PreMadeFood/preMadeFoods"><i class="fa fa-angle-double-right"></i> <?php echo lang('List'); ?> <?php echo lang('premade_food'); ?></a></li>
+                    <li data-access="add-212" class="menu_assign_class" data-menu__cid="irp_16"><a href="<?php echo base_url() ?>Unit/addEditUnit"><i class="fa fa-angle-double-right"></i> <?php echo lang('Add'); ?> <?php echo lang('Ingredient_Unit'); ?></a></li>
+                    <li data-access="view-212" class="menu_assign_class" data-menu__cid="irp_16"><a href="<?php echo base_url() ?>Unit/Units"><i class="fa fa-angle-double-right"></i> <?php echo lang('List'); ?> <?php echo lang('Ingredient_Unit'); ?></a></li>
+                    <li data-access="add-207" class="menu_assign_class" data-menu__cid="irp_16"><a href="<?php echo base_url() ?>ingredientCategory/addEditIngredientCategory"><i class="fa fa-angle-double-right"></i> <?php echo lang('Add'); ?> <?php echo lang('ingredient_category'); ?></a></li>
+                    <li data-access="view-207" class="menu_assign_class" data-menu__cid="irp_16"><a href="<?php echo base_url() ?>ingredientCategory/ingredientCategories"><i class="fa fa-angle-double-right"></i> <?php echo lang('List'); ?> <?php echo lang('ingredient_category'); ?></a></li>
+                    <li data-access="add-217" class="menu_assign_class" data-menu__cid="irp_16"><a href="<?php echo base_url() ?>ingredient/addEditIngredient"><i class="fa fa-angle-double-right"></i> <?php echo lang('Add'); ?> <?php echo lang('ingredient'); ?></a></li>
+                    <li data-access="view-217" class="menu_assign_class" data-menu__cid="irp_16"><a href="<?php echo base_url() ?>ingredient/ingredients"><i class="fa fa-angle-double-right"></i> <?php echo lang('List'); ?> <?php echo lang('ingredient'); ?></a></li>
+                    <li data-access="add-223" class="menu_assign_class" data-menu__cid="irp_16"><a href="<?php echo base_url() ?>modifier/addEditModifier"><i class="fa fa-angle-double-right"></i> <?php echo lang('Add'); ?> <?php echo lang('modifier'); ?></a></li>
+                    <li data-access="view-223" class="menu_assign_class" data-menu__cid="irp_16"><a href="<?php echo base_url() ?>modifier/modifiers"><i class="fa fa-angle-double-right"></i> <?php echo lang('List'); ?> <?php echo lang('modifier'); ?></a></li>
+                    <li data-access="add-229" class="menu_assign_class" data-menu__cid="irp_16"><a href="<?php echo base_url() ?>foodMenuCategory/addEditFoodMenuCategory"><i class="fa fa-angle-double-right"></i> <?php echo lang('Add'); ?> <?php echo lang('food_menu_category'); ?></a></li>
+                    <li data-access="view-229" class="menu_assign_class" data-menu__cid="irp_16"><a href="<?php echo base_url() ?>foodMenuCategory/foodMenuCategories"><i class="fa fa-angle-double-right"></i> <?php echo lang('List'); ?> <?php echo lang('food_menu_category'); ?></a></li>
+                    <li data-access="add-234" class="menu_assign_class" data-menu__cid="irp_16"><a href="<?php echo base_url() ?>foodMenu/addEditFoodMenu"><i class="fa fa-angle-double-right"></i> <?php echo lang('Add'); ?> <?php echo lang('food_menu'); ?></a></li>
+                    <li data-access="view-234" class="menu_assign_class" data-menu__cid="irp_16"><a href="<?php echo base_url() ?>foodMenu/foodMenus"><i class="fa fa-angle-double-right"></i> <?php echo lang('List'); ?> <?php echo lang('food_menu'); ?></a></li>
+                    <li data-access="add-325" class="menu_assign_class" data-menu__cid="irp_16"><a href="<?php echo base_url() ?>PreMadeFood/addEditPreMadeFood"><i class="fa fa-angle-double-right"></i> <?php echo lang('Add'); ?> <?php echo lang('premade_food'); ?></a></li>
+                    <li data-access="view-325" class="menu_assign_class" data-menu__cid="irp_16"><a href="<?php echo base_url() ?>PreMadeFood/preMadeFoods"><i class="fa fa-angle-double-right"></i> <?php echo lang('List'); ?> <?php echo lang('premade_food'); ?></a></li>
                 </ul>
             </li>
             <?php
-            if(str_rot13($language_manifesto)=="eriutoeri"):?>
+            if (str_rot13($language_manifesto) == 'eriutoeri'):
+                ?>
                 <li class="have_sub_menu">
                     <a class="open-trigger" href="javascript:void(0)">
                         <svg  width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-hard-drive"><line x1="22" y1="12" x2="2" y2="12"></line><path d="M5.45 5.11L2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"></path><line x1="6" y1="16" x2="6.01" y2="16"></line><line x1="10" y1="16" x2="10.01" y2="16"></line></svg>
@@ -3919,18 +3920,18 @@ foreach ($notifications as $single_notification){
                     </span>
                     </a>
                     <ul class="sub__menu__list">
-                        <li data-access="add-67" class="menu_assign_class" data-menu__cid="irp_3"><a href="<?php echo base_url()?>Outlet/addEditOutlet">
+                        <li data-access="add-67" class="menu_assign_class" data-menu__cid="irp_3"><a href="<?php echo base_url() ?>Outlet/addEditOutlet">
                                 <i class="fa fa-angle-double-right"></i> <?php echo lang('Add'); ?> <?php echo lang('outlet'); ?></a></li>
-                        <li data-access="view-67" class="menu_assign_class" data-menu__cid="irp_3"><a href="<?php echo base_url()?>Outlet/outlets">
+                        <li data-access="view-67" class="menu_assign_class" data-menu__cid="irp_3"><a href="<?php echo base_url() ?>Outlet/outlets">
                                 <i class="fa fa-angle-double-right"></i> <?php echo lang('List'); ?> <?php echo lang('outlet'); ?></a></li>
                     </ul>
                 </li>
-            <?php else:?>
-                <li data-access="update-67"><a href="<?php echo base_url()?>Outlet/addEditOutlet/<?php echo escape_output($outlet_id)?>">
+            <?php else: ?>
+                <li data-access="update-67"><a href="<?php echo base_url() ?>Outlet/addEditOutlet/<?php echo escape_output($outlet_id) ?>">
                         <svg  width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-hard-drive"><line x1="22" y1="12" x2="2" y2="12"></line><path d="M5.45 5.11L2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"></path><line x1="6" y1="16" x2="6.01" y2="16"></line><line x1="10" y1="16" x2="10.01" y2="16"></line></svg>
                          <span> &nbsp;  <?php echo lang('outlet_setting'); ?></span>
                     </a></li>
-            <?php endif;?>
+            <?php endif; ?>
 
 
             <li class="have_sub_menu">
@@ -3942,17 +3943,17 @@ foreach ($notifications as $single_notification){
                     </span>
                 </a>
                 <ul class="sub__menu__list">
-                    <li data-access="pos_1-73" class="menu_assign_class" data-menu__cid="irp_4"><a href="<?php echo base_url()?>POSChecker/posAndWaiterMiddleman">
+                    <li data-access="pos_1-73" class="menu_assign_class" data-menu__cid="irp_4"><a href="<?php echo base_url() ?>POSChecker/posAndWaiterMiddleman">
                              <i class="fa fa-angle-double-right"></i> <?php echo lang('pos'); ?></a></li>
-                    <li data-access="add-98" class="menu_assign_class" data-menu__cid="irp_4"><a href="<?php echo base_url()?>Kitchen/addEditKitchen">
+                    <li data-access="add-98" class="menu_assign_class" data-menu__cid="irp_4"><a href="<?php echo base_url() ?>Kitchen/addEditKitchen">
                              <i class="fa fa-angle-double-right"></i> <?php echo lang('Add'); ?> <?php echo lang('kitchen'); ?></a></li>
-                    <li data-access="view-98" class="menu_assign_class" data-menu__cid="irp_4"><a href="<?php echo base_url()?>Kitchen/kitchens">
+                    <li data-access="view-98" class="menu_assign_class" data-menu__cid="irp_4"><a href="<?php echo base_url() ?>Kitchen/kitchens">
                              <i class="fa fa-angle-double-right"></i> <?php echo lang('List'); ?> <?php echo lang('kitchen'); ?></a></li>
-                    <li data-access="view-104" class="menu_assign_class" data-menu__cid="irp_4"><a href="<?php echo base_url()?>Waiter/panel">
+                    <li data-access="view-104" class="menu_assign_class" data-menu__cid="irp_4"><a href="<?php echo base_url() ?>Waiter/panel">
                              <i class="fa fa-angle-double-right"></i> <?php echo lang('Waiter'); ?></a></li>
                 </ul>
             </li>
-            <li  data-access="view-1" class="menu_assign_class"><a href="<?php echo base_url()?>Dashboard/dashboard"><svg  width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-grid"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg><span> &nbsp; <?php echo lang('dashboard'); ?></span></a></li>
+            <li  data-access="view-1" class="menu_assign_class"><a href="<?php echo base_url() ?>Dashboard/dashboard"><svg  width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-grid"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg><span> &nbsp; <?php echo lang('dashboard'); ?></span></a></li>
             <li class="have_sub_menu">
                 <a class="open-trigger" href="javascript:void(0)">
                     <svg  width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-truck"><rect x="1" y="3" width="15" height="13"></rect><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"></polygon><circle cx="5.5" cy="18.5" r="2.5"></circle><circle cx="18.5" cy="18.5" r="2.5"></circle></svg>
@@ -3962,13 +3963,13 @@ foreach ($notifications as $single_notification){
                     </span>
                 </a>
                 <ul class="sub__menu__list">
-                    <li data-access="add-244" class="menu_assign_class" data-menu__cid="irp_6"><a href="<?php echo base_url()?>supplier/addEditSupplier">
+                    <li data-access="add-244" class="menu_assign_class" data-menu__cid="irp_6"><a href="<?php echo base_url() ?>supplier/addEditSupplier">
                              <i class="fa fa-angle-double-right"></i> <?php echo lang('Add'); ?> <?php echo lang('supplier'); ?></a></li>
-                    <li data-access="view-244" class="menu_assign_class" data-menu__cid="irp_6"><a href="<?php echo base_url()?>supplier/suppliers">
+                    <li data-access="view-244" class="menu_assign_class" data-menu__cid="irp_6"><a href="<?php echo base_url() ?>supplier/suppliers">
                              <i class="fa fa-angle-double-right"></i> <?php echo lang('List'); ?> <?php echo lang('supplier'); ?></a></li>
-                    <li data-access="add-106" class="menu_assign_class" data-menu__cid="irp_6"><a href="<?php echo base_url()?>Purchase/addEditPurchase">
+                    <li data-access="add-106" class="menu_assign_class" data-menu__cid="irp_6"><a href="<?php echo base_url() ?>Purchase/addEditPurchase">
                              <i class="fa fa-angle-double-right"></i> <?php echo lang('Add'); ?> <?php echo lang('purchase'); ?></a></li>
-                    <li data-access="view-106" class="menu_assign_class" data-menu__cid="irp_6"><a href="<?php echo base_url()?>Purchase/purchases">
+                    <li data-access="view-106" class="menu_assign_class" data-menu__cid="irp_6"><a href="<?php echo base_url() ?>Purchase/purchases">
                              <i class="fa fa-angle-double-right"></i> <?php echo lang('List'); ?> <?php echo lang('purchase'); ?></a></li>
                 </ul>
             </li>
@@ -3981,14 +3982,14 @@ foreach ($notifications as $single_notification){
                     </span>
                 </a>
                 <ul class="sub__menu__list">
-                    <li data-access="add-340" class="menu_assign_class" data-menu__cid="irp_6_1"><a href="<?php echo base_url()?>Production/addEditProduction">
+                    <li data-access="add-340" class="menu_assign_class" data-menu__cid="irp_6_1"><a href="<?php echo base_url() ?>Production/addEditProduction">
                             <i class="fa fa-angle-double-right"></i> <?php echo lang('Add'); ?> <?php echo lang('production'); ?></a></li>
-                    <li data-access="view-340" class="menu_assign_class" data-menu__cid="irp_6_1"><a href="<?php echo base_url()?>Production/productions">
+                    <li data-access="view-340" class="menu_assign_class" data-menu__cid="irp_6_1"><a href="<?php echo base_url() ?>Production/productions">
                             <i class="fa fa-angle-double-right"></i> <?php echo lang('List'); ?> <?php echo lang('production'); ?></a></li>
                 </ul>
             </li>
 
-            <?php if(str_rot13($data_c[0]) == "eriutoeri"):?>
+            <?php if (str_rot13($data_c[0]) == 'eriutoeri'): ?>
             <li class="have_sub_menu">
                 <a class="open-trigger" href="javascript:void(0)">
                     <svg  width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-truck"><rect x="1" y="3" width="15" height="13"></rect><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"></polygon><circle cx="5.5" cy="18.5" r="2.5"></circle><circle cx="18.5" cy="18.5" r="2.5"></circle></svg>
@@ -3998,13 +3999,13 @@ foreach ($notifications as $single_notification){
                     </span>
                 </a>
                 <ul class="sub__menu__list">
-                    <li data-access="add-112" class="menu_assign_class" data-menu__cid="irp_7"><a href="<?php echo base_url()?>Transfer/addEditTransfer">
+                    <li data-access="add-112" class="menu_assign_class" data-menu__cid="irp_7"><a href="<?php echo base_url() ?>Transfer/addEditTransfer">
                              <i class="fa fa-angle-double-right"></i> <?php echo lang('Add'); ?> <?php echo lang('transfer'); ?></a></li>
-                    <li data-access="view-112" class="menu_assign_class" data-menu__cid="irp_7"><a href="<?php echo base_url()?>Transfer/transfers">
+                    <li data-access="view-112" class="menu_assign_class" data-menu__cid="irp_7"><a href="<?php echo base_url() ?>Transfer/transfers">
                              <i class="fa fa-angle-double-right"></i> <?php echo lang('List'); ?> <?php echo lang('transfer'); ?></a></li>
                 </ul>
             </li>
-            <?php endif?>
+            <?php endif ?>
             <li class="have_sub_menu">
                 <a class="open-trigger" href="javascript:void(0)">
                     <svg  width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-shopping-cart"><circle cx="9" cy="21" r="1"></circle><circle cx="20" cy="21" r="1"></circle><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path></svg>
@@ -4014,21 +4015,21 @@ foreach ($notifications as $single_notification){
                     </span>
                 </a>
                 <ul class="sub__menu__list">
-                    <li data-access="add-118" class="menu_assign_class" data-menu__cid="8"><a href="<?php echo base_url()?>Promotion/addEditPromotion">
+                    <li data-access="add-118" class="menu_assign_class" data-menu__cid="8"><a href="<?php echo base_url() ?>Promotion/addEditPromotion">
                              <i class="fa fa-angle-double-right"></i> <?php echo lang('Add'); ?> <?php echo lang('promotion'); ?></a></li>
-                    <li data-access="view-118" class="menu_assign_class" data-menu__cid="8"><a href="<?php echo base_url()?>Promotion/promotions">
+                    <li data-access="view-118" class="menu_assign_class" data-menu__cid="8"><a href="<?php echo base_url() ?>Promotion/promotions">
                              <i class="fa fa-angle-double-right"></i> <?php echo lang('List'); ?> <?php echo lang('promotion'); ?></a></li>
 
-                    <li data-access="add-249" class="menu_assign_class" data-menu__cid="8"><a href="<?php echo base_url()?>customer/addEditCustomer">
+                    <li data-access="add-249" class="menu_assign_class" data-menu__cid="8"><a href="<?php echo base_url() ?>customer/addEditCustomer">
                              <i class="fa fa-angle-double-right"></i> <?php echo lang('Add'); ?> <?php echo lang('customer'); ?></a></li>
-                    <li data-access="view-249" class="menu_assign_class" data-menu__cid="8"><a href="<?php echo base_url()?>customer/customers">
+                    <li data-access="view-249" class="menu_assign_class" data-menu__cid="8"><a href="<?php echo base_url() ?>customer/customers">
                              <i class="fa fa-angle-double-right"></i> <?php echo lang('List'); ?> <?php echo lang('customer'); ?></a></li>
-                    <li data-access="upload_customer-249" class="menu_assign_class" data-menu__cid="8"><a href="<?php echo base_url()?>customer/uploadCustomer">
+                    <li data-access="upload_customer-249" class="menu_assign_class" data-menu__cid="8"><a href="<?php echo base_url() ?>customer/uploadCustomer">
                              <i class="fa fa-angle-double-right"></i> <?php echo lang('upload_customer'); ?></a></li>
 
-                    <li data-access="pos_1-73" class="menu_assign_class" data-menu__cid="8"><a href="<?php echo base_url()?>POSChecker/posAndWaiterMiddleman">
+                    <li data-access="pos_1-73" class="menu_assign_class" data-menu__cid="8"><a href="<?php echo base_url() ?>POSChecker/posAndWaiterMiddleman">
                              <i class="fa fa-angle-double-right"></i> <?php echo lang('Add'); ?> <?php echo lang('sale'); ?></a></li>
-                    <li data-access="view-123" class="menu_assign_class" data-menu__cid="8"><a href="<?php echo base_url()?>Sale/sales">
+                    <li data-access="view-123" class="menu_assign_class" data-menu__cid="8"><a href="<?php echo base_url() ?>Sale/sales">
                              <i class="fa fa-angle-double-right"></i> <?php echo lang('List'); ?> <?php echo lang('sale'); ?></a></li>
                 </ul>
             </li>
@@ -4041,15 +4042,15 @@ foreach ($notifications as $single_notification){
                     </span>
                 </a>
                 <ul class="sub__menu__list">
-                    <li data-access="view-129" class="menu_assign_class" data-menu__cid="irp_9"><a href="<?php echo base_url()?>Inventory/index">
+                    <li data-access="view-129" class="menu_assign_class" data-menu__cid="irp_9"><a href="<?php echo base_url() ?>Inventory/index">
                              <i class="fa fa-angle-double-right"></i> <?php echo lang('inventory'); ?></a></li>
-                    <li data-access="view-173" class="menu_assign_class" data-menu__cid="irp_9"><a href="<?php echo base_url()?>Inventory/getInventoryAlertList">
+                    <li data-access="view-173" class="menu_assign_class" data-menu__cid="irp_9"><a href="<?php echo base_url() ?>Inventory/getInventoryAlertList">
                              <i class="fa fa-angle-double-right"></i> <?php echo lang('ingredients_alert'); ?></a></li>
-                    <li data-access="veiw-346" class="menu_assign_class" data-menu__cid="irp_9"><a href="<?php echo base_url()?>Inventory/inventoryFoodMenu">
+                    <li data-access="veiw-346" class="menu_assign_class" data-menu__cid="irp_9"><a href="<?php echo base_url() ?>Inventory/inventoryFoodMenu">
                             <i class="fa fa-angle-double-right"></i> <?php echo lang('inventory_food_menu'); ?></a></li>
-                    <li data-access="add-131" class="menu_assign_class" data-menu__cid="irp_9"><a href="<?php echo base_url()?>Inventory_adjustment/addEditInventoryAdjustment">
+                    <li data-access="add-131" class="menu_assign_class" data-menu__cid="irp_9"><a href="<?php echo base_url() ?>Inventory_adjustment/addEditInventoryAdjustment">
                              <i class="fa fa-angle-double-right"></i> <?php echo lang('Add'); ?> <?php echo lang('inventory_adjustment'); ?></a></li>
-                    <li data-access="view-131" class="menu_assign_class" data-menu__cid="irp_9"><a href="<?php echo base_url()?>Inventory_adjustment/inventoryAdjustments">
+                    <li data-access="view-131" class="menu_assign_class" data-menu__cid="irp_9"><a href="<?php echo base_url() ?>Inventory_adjustment/inventoryAdjustments">
                              <i class="fa fa-angle-double-right"></i> <?php echo lang('List'); ?> <?php echo lang('inventory_adjustment'); ?></a></li>
                 </ul>
             </li>
@@ -4062,9 +4063,9 @@ foreach ($notifications as $single_notification){
                     </span>
                 </a>
                 <ul class="sub__menu__list">
-                    <li data-access="add-137" class="menu_assign_class" data-menu__cid="irp_10"><a href="<?php echo base_url()?>Waste/addEditWaste">
+                    <li data-access="add-137" class="menu_assign_class" data-menu__cid="irp_10"><a href="<?php echo base_url() ?>Waste/addEditWaste">
                              <i class="fa fa-angle-double-right"></i> <?php echo lang('Add'); ?> <?php echo lang('waste'); ?></a></li>
-                    <li data-access="view-137" class="menu_assign_class" data-menu__cid="irp_10"><a href="<?php echo base_url()?>Waste/wastes">
+                    <li data-access="view-137" class="menu_assign_class" data-menu__cid="irp_10"><a href="<?php echo base_url() ?>Waste/wastes">
                              <i class="fa fa-angle-double-right"></i> <?php echo lang('List'); ?> <?php echo lang('waste'); ?></a></li>
 
                 </ul>
@@ -4078,13 +4079,13 @@ foreach ($notifications as $single_notification){
                     </span>
                 </a>
                 <ul class="sub__menu__list">
-                    <li data-access="add-255" class="menu_assign_class" data-menu__cid="irp_11"><a href="<?php echo base_url()?>expenseItems/addEditExpenseItem">
+                    <li data-access="add-255" class="menu_assign_class" data-menu__cid="irp_11"><a href="<?php echo base_url() ?>expenseItems/addEditExpenseItem">
                              <i class="fa fa-angle-double-right"></i> <?php echo lang('Add'); ?> <?php echo lang('expense_item'); ?></a></li>
-                    <li data-access="view-255" class="menu_assign_class" data-menu__cid="irp_11"><a href="<?php echo base_url()?>expenseItems/expenseItems">
+                    <li data-access="view-255" class="menu_assign_class" data-menu__cid="irp_11"><a href="<?php echo base_url() ?>expenseItems/expenseItems">
                              <i class="fa fa-angle-double-right"></i> <?php echo lang('List'); ?> <?php echo lang('expense_item'); ?></a></li>
-                    <li data-access="add-142" class="menu_assign_class" data-menu__cid="irp_11"><a href="<?php echo base_url()?>Expense/addEditExpense">
+                    <li data-access="add-142" class="menu_assign_class" data-menu__cid="irp_11"><a href="<?php echo base_url() ?>Expense/addEditExpense">
                              <i class="fa fa-angle-double-right"></i> <?php echo lang('Add'); ?> <?php echo lang('expense'); ?></a></li>
-                    <li data-access="view-142" class="menu_assign_class" data-menu__cid="irp_11"><a href="<?php echo base_url()?>Expense/expenses">
+                    <li data-access="view-142" class="menu_assign_class" data-menu__cid="irp_11"><a href="<?php echo base_url() ?>Expense/expenses">
                              <i class="fa fa-angle-double-right"></i> <?php echo lang('List'); ?> <?php echo lang('expense'); ?></a></li>
 
                 </ul>
@@ -4098,9 +4099,9 @@ foreach ($notifications as $single_notification){
                     </span>
                 </a>
                 <ul class="sub__menu__list">
-                    <li data-access="add-147" class="menu_assign_class" data-menu__cid="irp_12"><a href="<?php echo base_url()?>SupplierPayment/addSupplierPayment">
+                    <li data-access="add-147" class="menu_assign_class" data-menu__cid="irp_12"><a href="<?php echo base_url() ?>SupplierPayment/addSupplierPayment">
                              <i class="fa fa-angle-double-right"></i> <?php echo lang('Add'); ?> <?php echo lang('supplier_due_payment'); ?></a></li>
-                    <li data-access="view-147" class="menu_assign_class" data-menu__cid="irp_12"><a href="<?php echo base_url()?>SupplierPayment/supplierPayments">
+                    <li data-access="view-147" class="menu_assign_class" data-menu__cid="irp_12"><a href="<?php echo base_url() ?>SupplierPayment/supplierPayments">
                              <i class="fa fa-angle-double-right"></i> <?php echo lang('List'); ?> <?php echo lang('supplier_due_payment'); ?></a></li>
 
                 </ul>
@@ -4114,9 +4115,9 @@ foreach ($notifications as $single_notification){
                     </span>
                 </a>
                 <ul class="sub__menu__list">
-                    <li data-access="add-151" class="menu_assign_class" data-menu__cid="irp_13"><a href="<?php echo base_url()?>Customer_due_receive/addCustomerDueReceive">
+                    <li data-access="add-151" class="menu_assign_class" data-menu__cid="irp_13"><a href="<?php echo base_url() ?>Customer_due_receive/addCustomerDueReceive">
                              <i class="fa fa-angle-double-right"></i> <?php echo lang('Add'); ?> <?php echo lang('customer_due_receive'); ?></a></li>
-                    <li data-access="view-151" class="menu_assign_class" data-menu__cid="irp_13"><a href="<?php echo base_url()?>Customer_due_receive/customerDueReceives">
+                    <li data-access="view-151" class="menu_assign_class" data-menu__cid="irp_13"><a href="<?php echo base_url() ?>Customer_due_receive/customerDueReceives">
                              <i class="fa fa-angle-double-right"></i> <?php echo lang('List'); ?> <?php echo lang('customer_due_receive'); ?></a></li> ?></a></li>
 
                 </ul>
@@ -4130,9 +4131,9 @@ foreach ($notifications as $single_notification){
                     </span>
                 </a>
                 <ul class="sub__menu__list">
-                    <li data-access="add-155" class="menu_assign_class" data-menu__cid="irp_14"><a href="<?php echo base_url()?>Attendance/addEditAttendance">
+                    <li data-access="add-155" class="menu_assign_class" data-menu__cid="irp_14"><a href="<?php echo base_url() ?>Attendance/addEditAttendance">
                              <i class="fa fa-angle-double-right"></i> <?php echo lang('Add'); ?> <?php echo lang('attendance'); ?></a></li>
-                    <li data-access="view-155" class="menu_assign_class" data-menu__cid="irp_14"><a href="<?php echo base_url()?>Attendance/attendances">
+                    <li data-access="view-155" class="menu_assign_class" data-menu__cid="irp_14"><a href="<?php echo base_url() ?>Attendance/attendances">
                              <i class="fa fa-angle-double-right"></i> <?php echo lang('List'); ?> <?php echo lang('attendance'); ?></a></li>
                 </ul>
             </li>
@@ -4145,35 +4146,35 @@ foreach ($notifications as $single_notification){
                     </span>
                 </a>
                 <ul class="sub__menu__list">
-                    <li data-access="view-159" class="menu_assign_class" data-menu__cid="irp_12irp_12irp_15"><a href="<?php echo base_url()?>Report/registerReport"><i class="fa fa-angle-double-right"></i> <?php echo lang('register_report'); ?></a></li>
-                    <li data-access="view-314" class="menu_assign_class" data-menu__cid="irp_15"><a href="<?php echo base_url()?>Report/zReport"><i class="fa fa-angle-double-right"></i> <?php echo lang('z_report'); ?></a></li>
-                    <li data-access="view-332" class="menu_assign_class" data-menu__cid="irp_15"><a href="<?php echo base_url()?>Report/productAnalysisReport"> <i class="fa fa-angle-double-right"></i> <?php echo lang('productAnalysisReport'); ?></a></li>
-                    <li data-access="view-161" class="menu_assign_class" data-menu__cid="irp_12irp_12irp_15"><a href="<?php echo base_url()?>Report/dailySummaryReport"><i class="fa fa-angle-double-right"></i> <?php echo lang('daily_summary_report'); ?></a></li>
-                    <li data-access="view-163" class="menu_assign_class" data-menu__cid="irp_15"><a href="<?php echo base_url()?>Report/foodMenuSales"><i class="fa fa-angle-double-right"></i> <?php echo lang('food_sale_report'); ?></a></li>
-                    <li data-access="view-165" class="menu_assign_class" data-menu__cid="irp_15"><a href="<?php echo base_url()?>Report/saleReportByDate"><i class="fa fa-angle-double-right"></i> <?php echo lang('daily_sale_report'); ?></a></li>
-                    <li data-access="view-167" class="menu_assign_class" data-menu__cid="irp_15"><a href="<?php echo base_url()?>Report/detailedSaleReport"><i class="fa fa-angle-double-right"></i> <?php echo lang('detailed_sale_report'); ?></a></li>
-                    <li data-access="view-169" class="menu_assign_class" data-menu__cid="irp_15"><a href="<?php echo base_url()?>Report/consumptionReport"><i class="fa fa-angle-double-right"></i> <?php echo lang('consumption_report'); ?></a></li>
-                    <li data-access="view-171" class="menu_assign_class" data-menu__cid="irp_15"><a href="<?php echo base_url()?>Report/inventoryReport"><i class="fa fa-angle-double-right"></i> <?php echo lang('inventory_report'); ?></a></li>
-                    <li data-access="view-173" class="menu_assign_class" data-menu__cid="irp_15"><a href="<?php echo base_url()?>Report/getInventoryAlertList"><i class="fa fa-angle-double-right"></i> <?php echo lang('low_inventory_report'); ?></a></li>
-                    <li data-access="view-175" class="menu_assign_class" data-menu__cid="irp_15"><a href="<?php echo base_url()?>Report/profitLossReport"><i class="fa fa-angle-double-right"></i> <?php echo lang('profit_loss_report'); ?></a></li>
-                    <li data-access="view-179" class="menu_assign_class" data-menu__cid="irp_15"><a href="<?php echo base_url()?>Report/attendanceReport"><i class="fa fa-angle-double-right"></i> <?php echo lang('attendance_report'); ?></a></li>
-                    <li data-access="view-181" class="menu_assign_class" data-menu__cid="irp_15"><a href="<?php echo base_url()?>Report/supplierLedgerReport"><i class="fa fa-angle-double-right"></i> <?php echo lang('supplier_ledger_report'); ?></a></li>
-                    <li data-access="view-183" class="menu_assign_class" data-menu__cid="irp_15"><a href="<?php echo base_url()?>Report/supplierDueReport"><i class="fa fa-angle-double-right"></i> <?php echo lang('supplier_due_report'); ?></a></li>
-                    <li data-access="view-185" class="menu_assign_class" data-menu__cid="irp_15"><a href="<?php echo base_url()?>Report/customerDueReport"><i class="fa fa-angle-double-right"></i> <?php echo lang('customer_due_report'); ?></a></li>
-                    <li data-access="view-187" class="menu_assign_class" data-menu__cid="irp_15"><a href="<?php echo base_url()?>Report/customerLedgerReport"><i class="fa fa-angle-double-right"></i> <?php echo lang('customer_ledger_report'); ?></a></li>
-                    <li data-access="view-189" class="menu_assign_class" data-menu__cid="irp_15"><a href="<?php echo base_url()?>Report/purchaseReportByDate"><i class="fa fa-angle-double-right"></i> <?php echo lang('purchase_report'); ?></a></li>
-                    <li data-access="view-191" class="menu_assign_class" data-menu__cid="irp_15"><a href="<?php echo base_url()?>Report/expenseReport"><i class="fa fa-angle-double-right"></i> <?php echo lang('expense_report'); ?></a></li>
-                    <li data-access="view-193" class="menu_assign_class" data-menu__cid="irp_15"><a href="<?php echo base_url()?>Report/wasteReport"><i class="fa fa-angle-double-right"></i> <?php echo lang('waste_report'); ?></a></li>
-                    <li data-access="view-195" class="menu_assign_class" data-menu__cid="irp_15"><a href="<?php echo base_url()?>Report/vatReport"><i class="fa fa-angle-double-right"></i> <?php echo lang('vat_report'); ?></a></li>
-                    <li data-access="view-197" class="menu_assign_class" data-menu__cid="irp_15"><a href="<?php echo base_url()?>Report/foodMenuSaleByCategories"><i class="fa fa-angle-double-right"></i> <?php echo lang('foodMenuSaleByCategories'); ?></a></li>
-                    <li data-access="view-199" class="menu_assign_class" data-menu__cid="irp_15"><a href="<?php echo base_url()?>Report/tipsReport"><i class="fa fa-angle-double-right"></i> <?php echo lang('tips_report'); ?></a></li>
-                    <li data-access="view-201" class="menu_assign_class" data-menu__cid="irp_15"><a href="<?php echo base_url()?>Report/auditLogReport"><i class="fa fa-angle-double-right"></i> <?php echo lang('auditLogReport'); ?></a></li>
-                    <li data-access="view-205" class="menu_assign_class" data-menu__cid="irp_15"><a href="<?php echo base_url()?>Report/availableLoyaltyPointReport"><i class="fa fa-angle-double-right"></i> <?php echo lang('loyalty_point_report'); ?></a></li>
-                    <li data-access="view-203" class="menu_assign_class" data-menu__cid="irp_15"><a href="<?php echo base_url()?>Report/usageLoyaltyPointReport"><i class="fa fa-angle-double-right"></i> <?php echo lang('usage_loyalty_point_report'); ?></a></li>
-                    <?php if(str_rot13($data_c[0]) == "eriutoeri"):?>
-                        <li data-access="view-307" class="menu_assign_class" data-menu__cid="irp_15"><a href="<?php echo base_url()?>Report/transferReport"><i class="fa fa-angle-double-right"></i> <?php echo lang('transferReport'); ?></a></li>
-                    <?php endif;?>
-                    <li data-access="view-337" class="menu_assign_class" data-menu__cid="irp_15"><a href="<?php echo base_url()?>Report/productionReport"><i class="fa fa-angle-double-right"></i> <?php echo lang('productionReport'); ?></a></li>
+                    <li data-access="view-159" class="menu_assign_class" data-menu__cid="irp_12irp_12irp_15"><a href="<?php echo base_url() ?>Report/registerReport"><i class="fa fa-angle-double-right"></i> <?php echo lang('register_report'); ?></a></li>
+                    <li data-access="view-314" class="menu_assign_class" data-menu__cid="irp_15"><a href="<?php echo base_url() ?>Report/zReport"><i class="fa fa-angle-double-right"></i> <?php echo lang('z_report'); ?></a></li>
+                    <li data-access="view-332" class="menu_assign_class" data-menu__cid="irp_15"><a href="<?php echo base_url() ?>Report/productAnalysisReport"> <i class="fa fa-angle-double-right"></i> <?php echo lang('productAnalysisReport'); ?></a></li>
+                    <li data-access="view-161" class="menu_assign_class" data-menu__cid="irp_12irp_12irp_15"><a href="<?php echo base_url() ?>Report/dailySummaryReport"><i class="fa fa-angle-double-right"></i> <?php echo lang('daily_summary_report'); ?></a></li>
+                    <li data-access="view-163" class="menu_assign_class" data-menu__cid="irp_15"><a href="<?php echo base_url() ?>Report/foodMenuSales"><i class="fa fa-angle-double-right"></i> <?php echo lang('food_sale_report'); ?></a></li>
+                    <li data-access="view-165" class="menu_assign_class" data-menu__cid="irp_15"><a href="<?php echo base_url() ?>Report/saleReportByDate"><i class="fa fa-angle-double-right"></i> <?php echo lang('daily_sale_report'); ?></a></li>
+                    <li data-access="view-167" class="menu_assign_class" data-menu__cid="irp_15"><a href="<?php echo base_url() ?>Report/detailedSaleReport"><i class="fa fa-angle-double-right"></i> <?php echo lang('detailed_sale_report'); ?></a></li>
+                    <li data-access="view-169" class="menu_assign_class" data-menu__cid="irp_15"><a href="<?php echo base_url() ?>Report/consumptionReport"><i class="fa fa-angle-double-right"></i> <?php echo lang('consumption_report'); ?></a></li>
+                    <li data-access="view-171" class="menu_assign_class" data-menu__cid="irp_15"><a href="<?php echo base_url() ?>Report/inventoryReport"><i class="fa fa-angle-double-right"></i> <?php echo lang('inventory_report'); ?></a></li>
+                    <li data-access="view-173" class="menu_assign_class" data-menu__cid="irp_15"><a href="<?php echo base_url() ?>Report/getInventoryAlertList"><i class="fa fa-angle-double-right"></i> <?php echo lang('low_inventory_report'); ?></a></li>
+                    <li data-access="view-175" class="menu_assign_class" data-menu__cid="irp_15"><a href="<?php echo base_url() ?>Report/profitLossReport"><i class="fa fa-angle-double-right"></i> <?php echo lang('profit_loss_report'); ?></a></li>
+                    <li data-access="view-179" class="menu_assign_class" data-menu__cid="irp_15"><a href="<?php echo base_url() ?>Report/attendanceReport"><i class="fa fa-angle-double-right"></i> <?php echo lang('attendance_report'); ?></a></li>
+                    <li data-access="view-181" class="menu_assign_class" data-menu__cid="irp_15"><a href="<?php echo base_url() ?>Report/supplierLedgerReport"><i class="fa fa-angle-double-right"></i> <?php echo lang('supplier_ledger_report'); ?></a></li>
+                    <li data-access="view-183" class="menu_assign_class" data-menu__cid="irp_15"><a href="<?php echo base_url() ?>Report/supplierDueReport"><i class="fa fa-angle-double-right"></i> <?php echo lang('supplier_due_report'); ?></a></li>
+                    <li data-access="view-185" class="menu_assign_class" data-menu__cid="irp_15"><a href="<?php echo base_url() ?>Report/customerDueReport"><i class="fa fa-angle-double-right"></i> <?php echo lang('customer_due_report'); ?></a></li>
+                    <li data-access="view-187" class="menu_assign_class" data-menu__cid="irp_15"><a href="<?php echo base_url() ?>Report/customerLedgerReport"><i class="fa fa-angle-double-right"></i> <?php echo lang('customer_ledger_report'); ?></a></li>
+                    <li data-access="view-189" class="menu_assign_class" data-menu__cid="irp_15"><a href="<?php echo base_url() ?>Report/purchaseReportByDate"><i class="fa fa-angle-double-right"></i> <?php echo lang('purchase_report'); ?></a></li>
+                    <li data-access="view-191" class="menu_assign_class" data-menu__cid="irp_15"><a href="<?php echo base_url() ?>Report/expenseReport"><i class="fa fa-angle-double-right"></i> <?php echo lang('expense_report'); ?></a></li>
+                    <li data-access="view-193" class="menu_assign_class" data-menu__cid="irp_15"><a href="<?php echo base_url() ?>Report/wasteReport"><i class="fa fa-angle-double-right"></i> <?php echo lang('waste_report'); ?></a></li>
+                    <li data-access="view-195" class="menu_assign_class" data-menu__cid="irp_15"><a href="<?php echo base_url() ?>Report/vatReport"><i class="fa fa-angle-double-right"></i> <?php echo lang('vat_report'); ?></a></li>
+                    <li data-access="view-197" class="menu_assign_class" data-menu__cid="irp_15"><a href="<?php echo base_url() ?>Report/foodMenuSaleByCategories"><i class="fa fa-angle-double-right"></i> <?php echo lang('foodMenuSaleByCategories'); ?></a></li>
+                    <li data-access="view-199" class="menu_assign_class" data-menu__cid="irp_15"><a href="<?php echo base_url() ?>Report/tipsReport"><i class="fa fa-angle-double-right"></i> <?php echo lang('tips_report'); ?></a></li>
+                    <li data-access="view-201" class="menu_assign_class" data-menu__cid="irp_15"><a href="<?php echo base_url() ?>Report/auditLogReport"><i class="fa fa-angle-double-right"></i> <?php echo lang('auditLogReport'); ?></a></li>
+                    <li data-access="view-205" class="menu_assign_class" data-menu__cid="irp_15"><a href="<?php echo base_url() ?>Report/availableLoyaltyPointReport"><i class="fa fa-angle-double-right"></i> <?php echo lang('loyalty_point_report'); ?></a></li>
+                    <li data-access="view-203" class="menu_assign_class" data-menu__cid="irp_15"><a href="<?php echo base_url() ?>Report/usageLoyaltyPointReport"><i class="fa fa-angle-double-right"></i> <?php echo lang('usage_loyalty_point_report'); ?></a></li>
+                    <?php if (str_rot13($data_c[0]) == 'eriutoeri'): ?>
+                        <li data-access="view-307" class="menu_assign_class" data-menu__cid="irp_15"><a href="<?php echo base_url() ?>Report/transferReport"><i class="fa fa-angle-double-right"></i> <?php echo lang('transferReport'); ?></a></li>
+                    <?php endif; ?>
+                    <li data-access="view-337" class="menu_assign_class" data-menu__cid="irp_15"><a href="<?php echo base_url() ?>Report/productionReport"><i class="fa fa-angle-double-right"></i> <?php echo lang('productionReport'); ?></a></li>
                 </ul>
             </li>
 
@@ -4186,33 +4187,34 @@ foreach ($notifications as $single_notification){
                     </span>
                 </a>
                 <ul class="sub__menu__list">
-                    <li data-access="add-285" class="menu_assign_class" data-menu__cid="irp_17"><a href="<?php echo base_url()?>Role/addEditRole"><i class="fa fa-angle-double-right"></i> <?php echo lang('Add'); ?> <?php echo lang('role'); ?></a></li>
-                    <li data-access="view-285" class="menu_assign_class" data-menu__cid="irp_17"><a href="<?php echo base_url()?>Role/roles"><i class="fa fa-angle-double-right"></i> <?php echo lang('List'); ?> <?php echo lang('role'); ?></a></li>
-                    <li data-access="add-291" class="menu_assign_class" data-menu__cid="irp_17"><a href="<?php echo base_url()?>User/addEditUser"><i class="fa fa-angle-double-right"></i> <?php echo lang('Add'); ?> <?php echo lang('user'); ?></a></li>
-                    <li data-access="view-291" class="menu_assign_class" data-menu__cid="irp_17"><a href="<?php echo base_url()?>User/users"><i class="fa fa-angle-double-right"></i> <?php echo lang('List'); ?> <?php echo lang('user'); ?></a></li>
-                    <li data-access="update-298" class="menu_assign_class" data-menu__cid="irp_17"><a href="<?php echo base_url()?>Authentication/changeProfile"><i class="fa fa-angle-double-right"></i> <?php echo lang('change_profile'); ?></a></li>
-                    <li data-access="update-300" class="menu_assign_class" data-menu__cid="irp_17"><a href="<?php echo base_url()?>Authentication/changePassword"><i class="fa fa-angle-double-right"></i> <?php echo lang('change_password'); ?></a></li>
-                    <li data-access="update-330" class="menu_assign_class" data-menu__cid="irp_17"><a href="<?php echo base_url()?>Authentication/changePin"><i class="fa fa-angle-double-right"></i> <?php echo lang('changePin'); ?></a></li>
-                    <li data-access="update-302" class="menu_assign_class" data-menu__cid="irp_17"><a href="<?php echo base_url()?>Authentication/securityQuestion"><i class="fa fa-angle-double-right"></i> <?php echo lang('SetSecurityQuestion'); ?></a></li>
-                    <li class="menu_assign_class" data-menu__cid="irp_17"><a href="<?php echo base_url()?>Authentication/logOut"><i class="fa fa-angle-double-right"></i> <?php echo lang('logout'); ?></a></li>
+                    <li data-access="add-285" class="menu_assign_class" data-menu__cid="irp_17"><a href="<?php echo base_url() ?>Role/addEditRole"><i class="fa fa-angle-double-right"></i> <?php echo lang('Add'); ?> <?php echo lang('role'); ?></a></li>
+                    <li data-access="view-285" class="menu_assign_class" data-menu__cid="irp_17"><a href="<?php echo base_url() ?>Role/roles"><i class="fa fa-angle-double-right"></i> <?php echo lang('List'); ?> <?php echo lang('role'); ?></a></li>
+                    <li data-access="add-291" class="menu_assign_class" data-menu__cid="irp_17"><a href="<?php echo base_url() ?>User/addEditUser"><i class="fa fa-angle-double-right"></i> <?php echo lang('Add'); ?> <?php echo lang('user'); ?></a></li>
+                    <li data-access="view-291" class="menu_assign_class" data-menu__cid="irp_17"><a href="<?php echo base_url() ?>User/users"><i class="fa fa-angle-double-right"></i> <?php echo lang('List'); ?> <?php echo lang('user'); ?></a></li>
+                    <li data-access="update-298" class="menu_assign_class" data-menu__cid="irp_17"><a href="<?php echo base_url() ?>Authentication/changeProfile"><i class="fa fa-angle-double-right"></i> <?php echo lang('change_profile'); ?></a></li>
+                    <li data-access="update-300" class="menu_assign_class" data-menu__cid="irp_17"><a href="<?php echo base_url() ?>Authentication/changePassword"><i class="fa fa-angle-double-right"></i> <?php echo lang('change_password'); ?></a></li>
+                    <li data-access="update-330" class="menu_assign_class" data-menu__cid="irp_17"><a href="<?php echo base_url() ?>Authentication/changePin"><i class="fa fa-angle-double-right"></i> <?php echo lang('changePin'); ?></a></li>
+                    <li data-access="update-302" class="menu_assign_class" data-menu__cid="irp_17"><a href="<?php echo base_url() ?>Authentication/securityQuestion"><i class="fa fa-angle-double-right"></i> <?php echo lang('SetSecurityQuestion'); ?></a></li>
+                    <li class="menu_assign_class" data-menu__cid="irp_17"><a href="<?php echo base_url() ?>Authentication/logOut"><i class="fa fa-angle-double-right"></i> <?php echo lang('logout'); ?></a></li>
                 </ul>
             </li>
-            <?php if(isServiceAccess('','','sGmsJaFJE')): ?>
-            <li  data-access="view-291" class="menu_assign_class"><a href="<?php echo base_url()?>Plugin/plugins"><svg  width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-file-text"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg> &nbsp; <?php echo lang('plugins'); ?></span></a></li>
-            <?php endif;?>
-            <li  data-access="view-321" class="menu_assign_class"><a href="<?php echo base_url()?>Short_message_service/smsService"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-mail"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg> &nbsp; <?php echo lang('send_sms'); ?></span></a></li>
+            <?php if (isServiceAccess('', '', 'sGmsJaFJE')): ?>
+            <li  data-access="view-291" class="menu_assign_class"><a href="<?php echo base_url() ?>Plugin/plugins"><svg  width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-file-text"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg> &nbsp; <?php echo lang('plugins'); ?></span></a></li>
+            <?php endif; ?>
+            <li  data-access="view-321" class="menu_assign_class"><a href="<?php echo base_url() ?>Short_message_service/smsService"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-mail"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg> &nbsp; <?php echo lang('send_sms'); ?></span></a></li>
         </ul>
     </aside>
     
-    <?php if(APPLICATION_MODE == 'demo'): ?>
+    <?php if (APPLICATION_MODE == 'demo'): ?>
                 <?php
                 $company = getMainCompany();
                 $language_manifesto = $company->language_manifesto;
-                if(str_rot13($language_manifesto)=="eriutoeri"):?>
+                if (str_rot13($language_manifesto) == 'eriutoeri'):
+                    ?>
                     <a class="btn btn-danger custom_shadow" href="https://codecanyon.net/item/irestora-plus-multi-outlet-next-gen-restaurant-pos/24077441" target="_blank">&nbsp;&nbsp;Buy Now&nbsp;&nbsp;</a>
-                <?php else:?>
+                <?php else: ?>
                     <a class="btn btn-danger custom_shadow" href="https://codecanyon.net/item/irestora-plus-next-gen-restaurant-pos/23033741" target="_blank">&nbsp;&nbsp;Buy Now&nbsp;&nbsp;</a>
-                <?php endif;?>
+                <?php endif; ?>
     <?php endif; ?>
     <div class="ir_display_none current_object_tables"></div>
     <div class="ir_display_none current_text_tables"></div>
@@ -4229,7 +4231,7 @@ foreach ($notifications as $single_notification){
     <script type="text/javascript" src="<?php echo base_url(); ?>assets/POS/js/lib/tippy/tippy-bundle.umd.min.js">
     </script>
     <script src="<?php echo base_url(); ?>assets/bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
-    <script src="<?php echo base_url();?>assets/POS/js/lib/datepicker.js"></script>
+    <script src="<?php echo base_url(); ?>assets/POS/js/lib/datepicker.js"></script>
     <!-- Custom Scrollbar -->
     <script type="text/javascript" src="<?php echo base_url(); ?>assets/POS/js/lib/scrollbar/jquery.scrollbar.min.js">
     </script>
@@ -4242,13 +4244,13 @@ foreach ($notifications as $single_notification){
     <script type="text/javascript" src="<?php echo base_url(); ?>assets/plugins/notify/jquery.notifyBar.js"></script>
     <script type="text/javascript">
     /*This variable could not be escaped because this is building object*/
-    window.customers = [<?php echo ($customer_objects);?>]
+    window.customers = [<?php echo ($customer_objects); ?>]
     /*This variable could not be escaped because this is building object*/
-    window.items = [<?php echo ($javascript_obects);?>];
+    window.items = [<?php echo ($javascript_obects); ?>];
     /*This variable could not be escaped because this is building object*/
-    window.only_modifiers = [<?php echo ($javascript_obects_only_modifier);?>];
+    window.only_modifiers = [<?php echo ($javascript_obects_only_modifier); ?>];
     /*This variable could not be escaped because this is building object*/
-    window.kitchens = [<?php echo ($kitchens_objects);?>];
+    window.kitchens = [<?php echo ($kitchens_objects); ?>];
 
     $('.widthAndHeight').text($(window).width() +'x'+ $(window).height())
 

@@ -5387,14 +5387,14 @@
                 removeOrderTablesBySaleId(sale_id, '');
             }
             // show token number field visible
+            // show token number field visible
             if (pre_or_post_payment == 2) {
                 $("#update_sale_id").val('');
-                // show token number field visible
-                $("#token_number").val('');
-                $("#token_number").show();
+                getTokenNumber();
             } else {
-                $("#token_number").val('');
-                $("#token_number").hide();
+                if(!sale_id){
+                    getTokenNumber();
+                }
             }
 
             let selected_order_type_object = $(".main_top").find('button[data-selected="selected"]'); getDateTime();
@@ -6071,12 +6071,21 @@
                     let inv_no = response.inv_no;
                     let sale_id = response.sale_id; // Make sure this exists in your response
                     let sale_inv_no = response.sale_inv_no || ''; // Optional
+                    let token_no = response.token_no;
+
+                    console.log("Token No: " + token_no);
+                    $("#token_number").val(token_no);
+
+                    // Add token_number to order_info object for printing
+                    let orderObj = JSON.parse(order_info);
+                    orderObj.token_number = token_no;
+                    let new_order_info = JSON.stringify(orderObj);
 
                     notify_online(inv_no);
 
                     setTimeout(function () {
                         $("#order_" + sale_id).remove();
-                        call_print_invoice(order_info, sale_inv_no, inv_no);
+                        call_print_invoice(new_order_info, sale_inv_no, inv_no);
                         $(".order_table_holder .order_holder").empty();
                         reset_finalize_modal();
                         clearFooterCartCalculation();
@@ -6404,15 +6413,16 @@
                                 `+ text_no_str + `
                                     <p class="p_txt">
                                         `+ inv_address + `: ` + outlet_address + `<br>
-                                        `+ inv_phone + `: ` + outlet_phone + `<br>
+                                    `+ inv_phone + `: ` + outlet_phone + `<br>
                                     </p>
+                                    `+ token_number + `
                                 </div>
-                                <table style="width:100%;margin-top: 10px;">
+                <table style="width:100%;margin-top: 10px;">
                     <tr>
                         <td style="text-align:left"><h5 style="margin-bottom: 0px; margin-top: 0px;"><b>Invoice no. - ` + (order.sale_inv_no || sale_inv_no || main_sale_inv_no) + `</b>
 </h5></td>
                         <td style="text-align:right"><h5 style="margin-bottom: 0px; margin-top: 0px;"><b>`+ order_type + `</b></h5></td>
-                    </tr>   
+                    </tr>
                 </table>
                 <table style="width:100%">
 						<tr>
@@ -6662,7 +6672,7 @@
                     <script src="`+ base_url + `assets/plugins/barcode/jquery.qrcode.min.js"></script>
                     <script>
                         $(function() {
-                          setTimeout(function(){ $('#barcode_invoice').qrcode("`+ base_url + `invoice/` + order.random_code + `");   window.print(); setTimeout(function() { window.close(); }, 500); }, 1000);
+                          setTimeout(function(){ $('#barcode_invoice').qrcode("`+ base_url + `invoice/` + order.random_code + `");   window.print(); setTimeout(function() { window.close(); }, 100); }, 100);
                          
                         });
                     </script>
@@ -6736,12 +6746,13 @@
                                         `+ inv_address + `: ` + outlet_address + `<br>
                                         `+ inv_phone + `: ` + outlet_phone + `<br>
                                     </p>
+                                    `+ token_number + `
                                 </div>
-                                <table style="width:100%;margin-top: 10px;">
+                                <table style="width:100%;margin-top: 10px;"> 
                     <tr>
                         <td style="text-align:left"><h5 style="margin-bottom: 0px; margin-top: 0px;"><b>` + `Invoice no.` + (sale_inv_no ? ' - ' + sale_inv_no : main_sale_inv_no) + `</b></h5></td>
                         <td style="text-align:right"><h5 style="margin-bottom: 0px; margin-top: 0px;"><b>`+ order_type + `</b></h5></td>
-                    </tr>   
+                    </tr>
                 </table>
                 <table style="width:100%">
 						<tr>
@@ -6925,8 +6936,12 @@
         <div class="page-break"></div>
     <div style="text-align:center;margin-top:5px;">
         <h4><b>KITCHEN ORDER TICKET</b></h4>
+        `+ token_number + `
     </div>
     <table style="width:100%;font-size:15px;margin-bottom:5px;">
+        <tr>    
+            <td style="text-align:center"></td>
+        </tr> 
         <tr>
             <td style="text-align:left;"><b>Invoice No.:</b> ` + (sale_inv_no ? sale_inv_no : order.sale_no) + `</td>
             <td style="text-align:right;"><b>` + order_type + `</b></td>
@@ -7080,6 +7095,7 @@
                                         `+ inv_address + `: ` + outlet_address + `<br>
                                         `+ inv_phone + `: ` + outlet_phone + `<br>
                                     </p>
+                                    `+ token_number + `
                                 </div>
                                 <table style="width:100%;margin-top: 10px;">
                     <tr>
@@ -8695,4 +8711,26 @@
     });
 	
 	$(".scrollbar-macosx").scrollbar();
+
+    // Fetch next token number when payment modal is shown
+    function getTokenNumber() {
+        $.ajax({
+            url: base_url + "Sale/get_new_token_number_ajax",
+            method: "GET",
+            success: function (response) {
+                $("#token_number").val(response);
+            }
+        });
+    }
+
+    $(document).ready(function() {
+        getTokenNumber();
+    });
+
+    $(document).on('shown.bs.modal', '#order_payment_modal', function () {
+         let sale_id = $("#update_sale_id").val();
+         if(!sale_id){
+            getTokenNumber();
+         }
+    });
 })(jQuery);
