@@ -582,7 +582,7 @@ class Sale extends Cl_Controller
         $data['payment_method_id'] = $this->input->get('payment_method_id');
         $data['user_id'] = $this->session->userdata('user_id');
         $data['outlet_id'] = $this->session->userdata('outlet_id');
-        $data['sale_date'] = $this->input->get('sale_date');
+        $data['sale_date'] = date('Y-m-d', strtotime($this->input->get('sale_date')));
         $data['sale_time'] = date('h:i A');
         $outlet_id = $this->session->userdata('outlet_id');
         $sale_no = $this->db->query("SELECT count(id) as bno
@@ -591,16 +591,14 @@ class Sale extends Cl_Controller
         $data['sale_no'] = $sale_no;
 
         // Token Number Generation
-        $token_number_post = $this->input->get('token_number');
-        if ($token_number_post) {
-            $data['token_number'] = $token_number_post;
-        } else {
-            $sale_date_for_token = date('Y-m-d');
-            $outlet_id_safe = $outlet_id ?? $this->session->userdata('outlet_id') ?? 0;
-            $token_query = $this->db->query("SELECT MAX(CAST(token_number AS UNSIGNED)) as tno FROM tbl_sales WHERE outlet_id='$outlet_id_safe' AND sale_date='$sale_date_for_token'");
-            $token_no = $token_query ? $token_query->row('tno') : 0;
-            $data['token_number'] = $token_no + 1;
-        }
+        // Token Number Generation
+        // Force backend calculation to ensure sequence integrity (1, 2, 3...)
+        // Ignore frontend input to prevent race conditions or stale data
+        // $token_number_post = $this->input->get('token_number');
+        // if ($token_number_post) {
+        //    $data['token_number'] = $token_number_post;
+        // } else {
+        $data['token_number'] = 0;  // Will be generated inside transaction
         // //////////
         $food_menu_id = $this->input->get('food_menu_id');
         $menu_name = $this->input->get('menu_name');
@@ -611,7 +609,23 @@ class Sale extends Cl_Controller
         // ///////////////////
 
         $this->db->trans_begin();
+
+        // Prevent Race Condition: Lock for this outlet
+        $outlet_id_safe = $outlet_id ?? $this->session->userdata('outlet_id') ?? 0;  // Ensure variable exists
+        $lock_name = 'token_lock_' . $outlet_id_safe;
+        $this->db->query('SELECT GET_LOCK(?, 10)', array($lock_name));
+
+        // Generate Token Number while locked
+        $sale_date_for_token = date('Y-m-d');
+        $token_query = $this->db->query('SELECT MAX(CAST(token_number AS UNSIGNED)) as max_token FROM tbl_sales WHERE outlet_id=? AND sale_date=?', array($outlet_id_safe, $sale_date_for_token));
+        $max_token = $token_query ? $token_query->row()->max_token : 0;
+        $token_no = ($max_token) ? $max_token + 1 : 1;
+
+        $data['token_number'] = $token_no;
+
         $query = $this->db->insert('tbl_sales', $data);
+
+        // Lock will be released after commit
         $sales_id = $this->db->insert_id();
 
         $comsump = array();
@@ -685,9 +699,11 @@ class Sale extends Cl_Controller
         $this->db->trans_complete();
         if ($this->db->trans_status() === FALSE) {
             $this->db->trans_rollback();
+            $this->db->query('SELECT RELEASE_LOCK(?)', array($lock_name));
         } else {
-            echo json_encode($returndata);
             $this->db->trans_commit();
+            $this->db->query('SELECT RELEASE_LOCK(?)', array($lock_name));
+            echo json_encode($returndata);
         }
     }
 
@@ -2874,15 +2890,7 @@ class Sale extends Cl_Controller
             $outlet_id = 0;
         }
         $sale_date_for_token = date('Y-m-d');
-        $token_number_from_frontend = $order->token_number ?? '';
-
-        if ($token_number_from_frontend != '') {
-            $token_no = $token_number_from_frontend;
-        } else {
-            $token_query = $this->db->query('SELECT MAX(CAST(token_number AS UNSIGNED)) as max_token FROM tbl_sales WHERE outlet_id=? AND sale_date=?', array($outlet_id, $sale_date_for_token));
-            $max_token = $token_query->row()->max_token;
-            $token_no = ($max_token) ? $max_token + 1 : 1;
-        }
+        $token_no = 0;  // Token will be generated inside transaction with lock
 
         // Base sale data
         $data = [
@@ -2938,11 +2946,33 @@ class Sale extends Cl_Controller
 
         $this->db->trans_begin();
 
+        // Prevent Race Condition: Lock for this outlet
+        $lock_name = 'token_lock_' . $outlet_id;
+        $this->db->query('SELECT GET_LOCK(?, 10)', array($lock_name));
+
+        // Generate Token Number while locked
+        $token_query = $this->db->query('SELECT MAX(CAST(token_number AS UNSIGNED)) as max_token FROM tbl_sales WHERE outlet_id=? AND sale_date=?', array($outlet_id, $sale_date_for_token));
+        $max_token = $token_query ? $token_query->row()->max_token : 0;
+        $token_no = ($max_token) ? $max_token + 1 : 1;
+
+        $data['token_number'] = $token_no;
+
         $this->db->insert('tbl_sales', $data);
+
+        // Lock will be released after commit to ensure visibility of new token
         $sale_id = $this->db->insert_id();
 
         $inv_no = $this->Sale_model->getNextInvoiceNumber();
-        $sale_inv_no = "{$inv_no}/" . date('y') . '/' . (date('y') + 1);
+        $month = date('m');
+        $year = date('y');
+        if ($month < 4) {
+            $fyStart = $year - 1;
+            $fyEnd = $year;
+        } else {
+            $fyStart = $year;
+            $fyEnd = $year + 1;
+        }
+        $sale_inv_no = "{$inv_no}/{$fyStart}/{$fyEnd}";
 
         $this->db->where('id', $sale_id)->update('tbl_sales', [
             'sale_no' => $sale_no,
@@ -3088,6 +3118,8 @@ class Sale extends Cl_Controller
 
         if ($this->db->trans_status() === FALSE) {
             $this->db->trans_rollback();
+            // Release lock on failure
+            $this->db->query('SELECT RELEASE_LOCK(?)', array('token_lock_' . $outlet_id));
             echo json_encode(['status' => 'error', 'message' => 'Transaction failed']);
             return;
         }
@@ -3106,6 +3138,8 @@ class Sale extends Cl_Controller
         }
 
         $this->db->trans_commit();
+        // Release lock after commit ensure next request sees the new token
+        $this->db->query('SELECT RELEASE_LOCK(?)', array('token_lock_' . $outlet_id));
 
         echo json_encode([
             'status' => 'success',
@@ -3120,7 +3154,16 @@ class Sale extends Cl_Controller
     public function get_invoiceNumber()
     {
         $inv_no = $this->Sale_model->getNextInvoiceNumber();
-        $sale_inv_no = "{$inv_no}/" . date('y') . '/' . (date('y') + 1);
+        $month = date('m');
+        $year = date('y');
+        if ($month < 4) {
+            $fyStart = $year - 1;
+            $fyEnd = $year;
+        } else {
+            $fyStart = $year;
+            $fyEnd = $year + 1;
+        }
+        $sale_inv_no = "{$inv_no}/{$fyStart}/{$fyEnd}";
 
         echo json_encode([
             'inv_no' => escape_output($inv_no),
